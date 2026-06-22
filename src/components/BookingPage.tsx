@@ -8,13 +8,13 @@ import {
 } from "lucide-react";
 
 const CARDS = [
-  { icon: Home,         label: "Domestic Cleaning",     badge: "Most Popular", rate: "£20/hr per cleaner", color: "#1a6bff", bg: "#e8f0ff" },
+  { icon: Home,        label: "Domestic Cleaning",     badge: "Most Popular", rate: "£20/hr per cleaner", color: "#1a6bff", bg: "#e8f0ff" },
   { icon: Building2,   label: "Commercial Cleaning",    badge: null,           rate: "£25/hr per cleaner", color: "#0891b2", bg: "#e0f2fe" },
   { icon: CheckCircle2,label: "End of Tenancy",         badge: "Fixed Price",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
   { icon: Sparkles,    label: "Carpet & Upholstery",    badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
   { icon: Flame,       label: "Oven Cleaning",          badge: "Fixed Price",  rate: "£60 flat",           color: "#dc2626", bg: "#fee2e2" },
   { icon: Truck,       label: "Man & Van",              badge: null,           rate: "£45/hr per person",  color: "#d97706", bg: "#fef3c7" },
-  { icon: Home,        label: "House Clearance",        badge: null,           rate: "£30/hr per cleaner", color: "#0f766e", bg: "#ccfbf1" },
+  { icon: Home,        label: "Clearance Service",      badge: null,           rate: "£30/hr per cleaner", color: "#0f766e", bg: "#ccfbf1" },
   { icon: Wrench,      label: "Property Maintenance",   badge: null,           rate: "£35/hr per person",  color: "#4f46e5", bg: "#e0e7ff" },
   { icon: Leaf,        label: "Plumbing & Heating",     badge: null,           rate: "£65/hr per tradesperson", color: "#be185d", bg: "#fce7f3" },
 ];
