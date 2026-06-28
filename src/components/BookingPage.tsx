@@ -1,14 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import BookingModal from "./BookingModal";
 import {
   Home, Building2, CheckCircle2, Sparkles, Flame,
-  Truck, Wrench, Leaf, Star, ArrowRight,
+  Truck, Wrench, Leaf, Star, ArrowRight, ArrowLeft,
 } from "lucide-react";
 
 const CARDS = [
-  { icon: Home,        label: "Domestic Cleaning",     badge: "Most Popular", rate: "£20/hr per cleaner", color: "#1a6bff", bg: "#e8f0ff" },
+  { icon: Home,        label: "Domestic Cleaning",      badge: "Most Popular", rate: "£20/hr per cleaner", color: "#1a6bff", bg: "#e8f0ff" },
   { icon: Building2,   label: "Commercial Cleaning",    badge: null,           rate: "£25/hr per cleaner", color: "#0891b2", bg: "#e0f2fe" },
   { icon: CheckCircle2,label: "End of Tenancy",         badge: "Fixed Price",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
   { icon: Sparkles,    label: "Carpet & Upholstery",    badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
@@ -29,10 +30,24 @@ export default function BookingPage() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', sans-serif; background: #f5f8ff; }
         .card:hover .arrow { transform: translateX(3px); }
+        .home-btn:hover { background: rgba(255,255,255,0.2) !important; }
       `}</style>
 
       {/* Hero */}
-      <section style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a7a)", padding: "64px 24px 56px", textAlign: "center" }}>
+      <section style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a7a)", padding: "64px 24px 56px", textAlign: "center", position: "relative" }}>
+
+        {/* Home button */}
+        <Link href="/" className="home-btn" style={{
+          position: "absolute", top: 24, left: 24,
+          display: "inline-flex", alignItems: "center", gap: 7,
+          background: "rgba(255,255,255,0.12)", color: "#fff",
+          padding: "8px 16px", borderRadius: 8, fontSize: 14,
+          fontWeight: 600, textDecoration: "none",
+          border: "1px solid rgba(255,255,255,0.2)",
+        }}>
+          <ArrowLeft size={15} /> Home
+        </Link>
+
         <span style={{ background: "rgba(255,255,255,0.12)", color: "#93c5fd", padding: "5px 14px", borderRadius: 20, fontSize: 13, fontWeight: 600 }}>
           Instant Online Booking
         </span>
@@ -77,11 +92,7 @@ export default function BookingPage() {
               <h3 style={{ fontWeight: 700, fontSize: 16, color: "#0d1b3e", marginTop: 16 }}>{label}</h3>
 
               <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 8 }}>
-                <Star size={13} fill="#facc15" color="#facc15" />
-                <Star size={13} fill="#facc15" color="#facc15" />
-                <Star size={13} fill="#facc15" color="#facc15" />
-                <Star size={13} fill="#facc15" color="#facc15" />
-                <Star size={13} fill="#facc15" color="#facc15" />
+                {[1,2,3,4,5].map(i => <Star key={i} size={13} fill="#facc15" color="#facc15" />)}
                 <span style={{ fontSize: 12, color: "#8a96b0", marginLeft: 2 }}>5.0</span>
               </div>
 
@@ -103,7 +114,6 @@ export default function BookingPage() {
         </div>
       </section>
 
-      {/* Modal */}
       {open && <BookingModal onClose={() => setOpen(false)} />}
     </>
   );
