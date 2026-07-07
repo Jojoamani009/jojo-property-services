@@ -5,19 +5,20 @@ import Link from "next/link";
 import BookingModal from "./BookingModal";
 import {
   Home, Building2, CheckCircle2, Sparkles, Flame,
-  Truck, Wrench, Leaf, Star, ArrowRight, ArrowLeft,
+  Truck, Wrench, Leaf, Star, ArrowRight, ArrowLeft, Brush,
 } from "lucide-react";
 
 const CARDS = [
-  { icon: Home,        label: "Domestic Cleaning",      badge: "Most Popular", rate: "£20/hr per cleaner", color: "#1a6bff", bg: "#e8f0ff" },
-  { icon: Building2,   label: "Commercial Cleaning",    badge: null,           rate: "£25/hr per cleaner", color: "#0891b2", bg: "#e0f2fe" },
-  { icon: CheckCircle2,label: "End of Tenancy",         badge: "Fixed Price",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
-  { icon: Sparkles,    label: "Carpet & Upholstery",    badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
-  { icon: Flame,       label: "Oven Cleaning",          badge: "Fixed Price",  rate: "£60 flat",           color: "#dc2626", bg: "#fee2e2" },
-  { icon: Truck,       label: "Man & Van",              badge: null,           rate: "£45/hr per person",  color: "#d97706", bg: "#fef3c7" },
-  { icon: Home,        label: "Clearance Service",      badge: null,           rate: "£30/hr per cleaner", color: "#0f766e", bg: "#ccfbf1" },
-  { icon: Wrench,      label: "Property Maintenance",   badge: null,           rate: "£35/hr per person",  color: "#4f46e5", bg: "#e0e7ff" },
-  { icon: Leaf,        label: "Plumbing & Heating",     badge: null,           rate: "£65/hr per tradesperson", color: "#be185d", bg: "#fce7f3" },
+  { icon: Home,         label: "Domestic Clean",     badge: "Most Popular", rate: "£20/hr ", color: "#1a6bff", bg: "#e8f0ff" },
+  { icon: Building2,    label: "Commercial Clean",   badge: null,           rate: "£25/hr ", color: "#0891b2", bg: "#e0f2fe" },
+  { icon: CheckCircle2, label: "End of Tenancy Clean",        badge: "Fixed Price (1-bed house/flat",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
+  { icon: Sparkles,     label: "Carpet & Upholstery Clean",   badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
+  { icon: Flame,        label: "Oven Clean",         badge: "Fixed Price",  rate: "£60/oven",           color: "#dc2626", bg: "#fee2e2" },
+  { icon: Truck,        label: "Man & Van",             badge: null,           rate: "POA",                color: "#d97706", bg: "#fef3c7" },
+  { icon: Home,         label: "Clearance Service",     badge: null,           rate: "POA",                color: "#0f766e", bg: "#ccfbf1" },
+  { icon: Wrench,       label: "Property Maintenance",  badge: null,           rate: "POA",                color: "#4f46e5", bg: "#e0e7ff" },
+  { icon: Leaf,         label: "Plumbing & Heating",    badge: null,           rate: "POA",                color: "#be185d", bg: "#fce7f3" },
+  { icon: Brush,        label: "Painting & Decoration", badge: null,           rate: "£200/room",          color: "#b45309", bg: "#fff7ed" },
 ];
 
 export default function BookingPage() {
@@ -30,13 +31,12 @@ export default function BookingPage() {
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'DM Sans', sans-serif; background: #f5f8ff; }
         .card:hover .arrow { transform: translateX(3px); }
-        .home-btn:hover { background: rgba(255,255,255,0.2) !important; }
+        .home-btn:hover { background: rgba(255,255,255,0.22) !important; }
       `}</style>
 
       {/* Hero */}
       <section style={{ background: "linear-gradient(135deg,#0d1b3e,#1a3a7a)", padding: "64px 24px 56px", textAlign: "center", position: "relative" }}>
 
-        {/* Home button */}
         <Link href="/" className="home-btn" style={{
           position: "absolute", top: 24, left: 24,
           display: "inline-flex", alignItems: "center", gap: 7,
