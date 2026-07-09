@@ -15,23 +15,23 @@ const BRAND = {
 };
 
 const services = [
-  { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                                    from: "POA"    },
-  { icon: Building2,    label: "End of Tenancy Clean",  desc: "Guaranteed deposit-back end of tenancy/one-off deep clean",                                                                                           from: "£25/hr" },
-  { icon: CheckCircle2, label: "Domestic Clean",        desc: "Regular, flexible private property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean (Charges separately)",            from: "£20/hr" },
-  { icon: Sparkles,     label: "Commercial Clean",      desc: "Regular, flexible offices and retail property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean",                      from: "£27/hr" },
-  { icon: Truck,        label: "Man & Van",             desc: "Tip run, Pick-up & Drop off, Local moves & collections",                                                                                              from: "POA"    },
-  { icon: Home,         label: "House Clearance",       desc: "House, Garage, Shed & Garden clearance, and disposed responsibly",                                                                                    from: "POA"    },
-  { icon: Home,         label: "Garden Maintenance",    desc: "Regular garden maintenance & fences installation/repair",                                                                                             from: "POA"    },
-  { icon: Wrench,       label: "Plumbing & Heating",    desc: "Qualified & reliable tradespeople for all plumbing works, such as bathroom tap/toilet/sink leaks & fixes",                                           from: "POA"    },
-  { icon: Brush,        label: "Painting & Decoration", desc: "Qualified & reliable tradespeople for all kinds of painting & decoration work",                                                                       from: "£200/room" },
+  { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                 from: "POA"       },
+  { icon: Building2,    label: "End of Tenancy Clean",  desc: "Guaranteed deposit-back end of tenancy/one-off deep clean",                                                                       from: "£25/hr"    },
+  { icon: CheckCircle2, label: "Domestic Clean",        desc: "Regular, flexible private property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean (Charges separately)", from: "£20/hr" },
+  { icon: Sparkles,     label: "Commercial Clean",      desc: "Regular, flexible offices and retail property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean", from: "£27/hr"    },
+  { icon: Truck,        label: "Man & Van",             desc: "Tip run, Pick-up & Drop off, Local moves & collections",                                                                         from: "POA"       },
+  { icon: Home,         label: "House Clearance",       desc: "House, Garage, Shed & Garden clearance, and disposed responsibly",                                                               from: "POA"       },
+  { icon: Home,         label: "Garden Maintenance",    desc: "Regular garden maintenance & fences installation/repair",                                                                        from: "POA"       },
+  { icon: Wrench,       label: "Plumbing & Heating",    desc: "Qualified & reliable tradespeople for all plumbing works, such as bathroom tap/toilet/sink leaks & fixes",                      from: "POA"       },
+  { icon: Brush,        label: "Painting & Decoration", desc: "Qualified & reliable tradespeople for all kinds of painting & decoration work",                                                  from: "£200/room" },
 ];
 
 const areas = ["Peterborough", "Wisbech", "March", "Market Deeping", "Bourne", "Stamford", "Whittlesey"];
 
 const reviews = [
-  { name: "Maria K.",      loc: "Peterborough",   stars: 5, text: "I was very happy with the service today. The upholstery, mattress, and sofa deep cleaning were done to a very high standard, and everything looks and feels much cleaner. Thank you for your excellent work." },
-  { name: "Kat.",          loc: "March",          stars: 5, text: "Punctual, friendly and did an excellent job on an end of tenancy clean on a 2 bedroom apartment. Thank you" },
-  { name: "Georgiana D.",  loc: "Market Deeping", stars: 5, text: "Lovely service. Hard workers. Great experience all round" },
+  { name: "Maria K.",     loc: "Peterborough",   stars: 5, text: "I was very happy with the service today. The upholstery, mattress, and sofa deep cleaning were done to a very high standard, and everything looks and feels much cleaner. Thank you for your excellent work." },
+  { name: "Kat.",         loc: "March",          stars: 5, text: "Punctual, friendly and did an excellent job on an end of tenancy clean on a 2 bedroom apartment. Thank you" },
+  { name: "Georgiana D.", loc: "Market Deeping", stars: 5, text: "Lovely service. Hard workers. Great experience all round" },
 ];
 
 const trustItems = [
@@ -57,6 +57,8 @@ const EMPTY_FORM: FormData = { name: "", phone: "", email: "", postcode: "", dat
 export default function HomePage() {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const [calcHours, setCalcHours] = useState(2);
+  const [calcCleaners, setCalcCleaners] = useState(1);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -76,8 +78,8 @@ export default function HomePage() {
         html { scroll-behavior: smooth; }
         .btn-primary { background: #1a6bff; color: #fff; border: none; padding: 14px 28px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s, transform 0.1s; }
         .btn-primary:hover { background: #0f55d4; transform: translateY(-1px); }
-        .btn-outline { background: transparent; color: #1a6bff; border: 2px solid #1a6bff; padding: 12px 26px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s; }
-        .btn-outline:hover { background: #1a6bff; color: #fff; }
+        .btn-outline { background: transparent; color: #fff; border: 2px solid #fff; padding: 12px 26px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background 0.2s, color 0.2s; text-decoration: none; }
+        .btn-outline:hover { background: #fff; color: #1a6bff; }
         .section { padding: 72px 0; }
         .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
         .section-label { display: inline-block; background: #e8f0ff; color: #1a6bff; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 16px; }
@@ -92,15 +94,13 @@ export default function HomePage() {
 
       {/* NAV */}
       <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", borderBottom: "1px solid #eef0f7", boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
-        <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 68 }}>
-          
+        <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 80 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-  <img src="/logo.jpg" alt="Jojo Property Services Ltd" style={{ height: 100, width: 90, borderRadius: 10, objectFit: "cover" }} />
-  <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 600, fontSize: 25, color: "#0d1b3e", lineHeight: 1.2 }}>
-    Jojo Property Services Ltd
-  </span>
-</div>
-          
+            <img src="/logo.jpg" alt="Jojo Property Services Ltd" style={{ height: 70, width: 70, borderRadius: 10, objectFit: "cover" }} />
+            <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "#0d1b3e", lineHeight: 1.2 }}>
+              Jojo Property Services Ltd
+            </span>
+          </div>
           <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
             {["Services", "Pricing", "Areas", "Reviews", "Contact"].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} style={{ fontSize: 14, fontWeight: 500, color: "#3d4a6b", textDecoration: "none" }}>
@@ -119,15 +119,17 @@ export default function HomePage() {
       </nav>
 
       {/* HERO */}
-      <section style={{ background: "linear-gradient(135deg, #f0f5ff 0%, #fafbff 60%, #e8f4f8 100%)", padding: "80px 0 72px" }}>
+      <section style={{ background: "linear-gradient(135deg, #0d1b3e 0%, #1a3a7a 60%, #0d1b3e 100%)", padding: "80px 0 72px" }}>
         <div className="container" style={{ display: "grid", gridTemplateColumns: "1fr 440px", gap: 60, alignItems: "center" }}>
           <div>
-            <div className="section-label">Peterborough's Trusted Property Service Specialist</div>
-            <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 52, fontWeight: 700, lineHeight: 1.15, color: "#0d1b3e", marginTop: 4 }}>
+            <div className="section-label" style={{ background: "rgba(255,255,255,0.15)", color: "#93c5fd" }}>
+              Peterborough's Trusted Property Service Specialist
+            </div>
+            <h1 style={{ fontFamily: "'Playfair Display', serif", fontSize: 52, fontWeight: 700, lineHeight: 1.15, color: "#fff", marginTop: 4 }}>
               Professional Property Services — Cleaning, Maintenance & More!
             </h1>
-            <p style={{ fontSize: 17, color: "#5a6782", marginTop: 20, lineHeight: 1.7, maxWidth: 520 }}>
-              Fully insured, DBS-checked specialists serving Peterborough and surrounding areas. From regular domestic cleans to full property clearances — spotless results every time.
+            <p style={{ fontSize: 17, color: "rgba(255,255,255,0.75)", marginTop: 20, lineHeight: 1.7, maxWidth: 520 }}>
+              Fully insured, DBS-checked specialists serving Peterborough and surrounding areas. From regular domestic/commercial cleans to full property maintenance — amazing results every time.
             </p>
             <div style={{ display: "flex", gap: 14, marginTop: 32, flexWrap: "wrap" }}>
               <a href="#contact" className="btn-primary">Get Free Quote</a>
@@ -136,42 +138,110 @@ export default function HomePage() {
             <div style={{ display: "flex", gap: 28, marginTop: 36, flexWrap: "wrap" }}>
               {[{ val: "500+", label: "Happy Clients" }, { val: "8+", label: "Years Experience" }, { val: "100%", label: "Insured & Vetted" }].map(({ val, label }) => (
                 <div key={label}>
-                  <div style={{ fontSize: 26, fontWeight: 700, color: "#1a6bff", fontFamily: "'Playfair Display', serif" }}>{val}</div>
-                  <div style={{ fontSize: 13, color: "#8a96b0", marginTop: 2 }}>{label}</div>
+                  <div style={{ fontSize: 26, fontWeight: 700, color: "#60a5fa", fontFamily: "'Playfair Display', serif" }}>{val}</div>
+                  <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{label}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Quick Quote Card */}
+          {/* Instant Price Calculator */}
           <div style={{ background: "#fff", borderRadius: 20, padding: 32, boxShadow: "0 8px 40px rgba(26,107,255,0.10)", border: "1px solid #eef1f8" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
               <div style={{ background: "#e8f0ff", borderRadius: 8, padding: 8 }}>
                 <Sparkles size={20} color="#1a6bff" />
               </div>
-              <span style={{ fontWeight: 600, fontSize: 15, color: "#0d1b3e" }}>Quick Quote</span>
+              <span style={{ fontWeight: 700, fontSize: 16, color: "#0d1b3e" }}>Instant Price Calculator</span>
             </div>
-            {submitted ? (
-              <div style={{ textAlign: "center", padding: "24px 0" }}>
-                <CheckCircle2 size={48} color="#16a34a" style={{ margin: "0 auto 12px" }} />
-                <p style={{ fontWeight: 600, fontSize: 16, color: "#0d1b3e" }}>Thanks! We'll be in touch shortly.</p>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>SERVICE</label>
+              <select value={formData.service} name="service" onChange={handleChange}
+                style={{ width: "100%", border: "1.5px solid #dce3f0", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontFamily: "inherit", color: "#1a1a2e", background: "#fff", outline: "none" }}>
+                <option value="">Select a Service</option>
+                <option value="domestic">Domestic Cleaning — £20/hr per cleaner</option>
+                <option value="commercial">Commercial Cleaning — £25/hr per cleaner</option>
+                <option value="tenancy">End of Tenancy — From £140</option>
+                <option value="carpet">Carpet & Upholstery — £70/room</option>
+                <option value="oven">Oven Cleaning — £60/oven</option>
+                <option value="manvan">Man & Van — POA</option>
+                <option value="clearance">House Clearance — POA</option>
+                <option value="maintenance">Property Maintenance — POA</option>
+                <option value="plumbing">Plumbing & Heating — POA</option>
+                <option value="painting">Painting & Decoration — £200/room</option>
+              </select>
+            </div>
+
+            {["domestic", "commercial"].includes(formData.service) && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>HOURS NEEDED</label>
+                  <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #dce3f0", borderRadius: 8, overflow: "hidden" }}>
+                    <button onClick={() => setCalcHours(h => Math.max(1, h - 1))} style={{ width: 44, height: 44, background: "#f5f8ff", border: "none", cursor: "pointer", fontSize: 18, color: "#1a6bff" }}>−</button>
+                    <span style={{ flex: 1, textAlign: "center", fontWeight: 700, fontSize: 16, color: "#0d1b3e" }}>{calcHours}</span>
+                    <button onClick={() => setCalcHours(h => Math.min(12, h + 1))} style={{ width: 44, height: 44, background: "#f5f8ff", border: "none", cursor: "pointer", fontSize: 18, color: "#1a6bff" }}>+</button>
+                  </div>
+                </div>
+                <div>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>CLEANERS</label>
+                  <div style={{ display: "flex", alignItems: "center", border: "1.5px solid #dce3f0", borderRadius: 8, overflow: "hidden" }}>
+                    <button onClick={() => setCalcCleaners(c => Math.max(1, c - 1))} style={{ width: 44, height: 44, background: "#f5f8ff", border: "none", cursor: "pointer", fontSize: 18, color: "#1a6bff" }}>−</button>
+                    <span style={{ flex: 1, textAlign: "center", fontWeight: 700, fontSize: 16, color: "#0d1b3e" }}>{calcCleaners}</span>
+                    <button onClick={() => setCalcCleaners(c => Math.min(6, c + 1))} style={{ width: 44, height: 44, background: "#f5f8ff", border: "none", cursor: "pointer", fontSize: 18, color: "#1a6bff" }}>+</button>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <input name="name" placeholder="Your Name" required value={formData.name} onChange={handleChange} />
-                <input name="phone" placeholder="Phone Number" required value={formData.phone} onChange={handleChange} />
-                <input name="email" placeholder="Email" required value={formData.email} onChange={handleChange} />
-                <input name="postcode" placeholder="Postcode" required value={formData.postcode} onChange={handleChange} />
-                <input name="date" placeholder="Date of Service" type="date" value={formData.date} onChange={handleChange} />
-                <select name="service" value={formData.service} onChange={handleChange}
-                  style={{ border: "1.5px solid #dce3f0", borderRadius: 8, padding: "13px 16px", fontSize: 15, fontFamily: "inherit", color: formData.service ? "#1a1a2e" : "#9aa5be", background: "#fff", outline: "none", width: "100%" }}>
-                  <option value="">Select a Service</option>
-                  {services.map((s) => <option key={s.label} value={s.label}>{s.label}</option>)}
-                </select>
-                <textarea name="message" placeholder="Any extra details..." rows={3} value={formData.message} onChange={handleChange} />
-                <button type="submit" className="btn-primary" style={{ marginTop: 4 }}>Request Free Quote</button>
-              </form>
             )}
+
+            {["domestic", "commercial", "tenancy", "carpet", "oven"].includes(formData.service) && (
+              <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", marginBottom: 6 }}>ESTIMATED PRICE</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <div style={{ fontSize: 40, fontWeight: 800, color: "#1a6bff", lineHeight: 1 }}>
+                      £{
+                        formData.service === "domestic" ? calcHours * calcCleaners * 20 :
+                        formData.service === "commercial" ? calcHours * calcCleaners * 25 :
+                        formData.service === "tenancy" ? 140 :
+                        formData.service === "carpet" ? 70 :
+                        formData.service === "oven" ? 60 : 0
+                      }
+                    </div>
+                    <div style={{ fontSize: 13, color: "#8a96b0", marginTop: 4 }}>
+                      {formData.service === "domestic" && `${calcHours} hrs × ${calcCleaners} cleaner${calcCleaners > 1 ? "s" : ""} @ £20/hr`}
+                      {formData.service === "commercial" && `${calcHours} hrs × ${calcCleaners} cleaner${calcCleaners > 1 ? "s" : ""} @ £25/hr`}
+                      {formData.service === "tenancy" && "1-bed fixed price"}
+                      {formData.service === "carpet" && "per room"}
+                      {formData.service === "oven" && "standard oven"}
+                    </div>
+                  </div>
+                  <div style={{ width: 44, height: 44, background: "#1a6bff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <CheckCircle2 size={22} color="#fff" />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {["manvan", "clearance", "maintenance", "plumbing", "painting"].includes(formData.service) && (
+              <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", marginBottom: 16, textAlign: "center" }}>
+                <div style={{ fontSize: 13, color: "#5a6782" }}>Price on Application — we'll provide a tailored quote</div>
+              </div>
+            )}
+
+            <p style={{ fontSize: 12, color: "#9aa5be", marginBottom: 12 }}>* Indicative price. Final quote confirmed after a quick assessment. No deposit required.</p>
+
+            <a href="/booking" style={{ display: "block", background: "#1a6bff", color: "#fff", textAlign: "center", padding: "14px", borderRadius: 10, fontWeight: 700, fontSize: 15, textDecoration: "none" }}>
+              Book This Service →
+            </a>
+
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 12, color: "#8a96b0", marginBottom: 8 }}>Quote on request:</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {["Man & Van / House Clearance", "Property Maintenance", "Plumbing & Heating", "Garden Maintenance", "Painting & Decoration"].map(tag => (
+                  <span key={tag} style={{ background: "#f5f8ff", border: "1px solid #dce3f0", borderRadius: 20, padding: "4px 12px", fontSize: 12, color: "#5a6782" }}>{tag}</span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -240,16 +310,16 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {([
-                  ["Domestic Cleaning",         "£20/hr"      ],
-                  ["Commercial Cleaning",       "£25/hr"      ],
-                  ["End of Tenancy (1-bed)",    "£140"        ],
-                  ["Carpet Deep Clean",         "£70/room"    ],
-                  ["Sofa Deep Clean",           "£30/sofa seat"],
-                  ["Oven Deep Clean",           "£60/oven"    ],
-                  ["Painting & Decoration",     "£200/room"   ],
-                  ["Man & Van",                 "POA"         ],
-                  ["House Clearance",           "POA"         ],
-                  ["Plumbing & Heating",        "POA"         ],
+                  ["Domestic Cleaning",      "£20/hr"       ],
+                  ["Commercial Cleaning",    "£25/hr"       ],
+                  ["End of Tenancy (1-bed)", "£140"         ],
+                  ["Carpet Deep Clean",      "£70/room"     ],
+                  ["Sofa Deep Clean",        "£30/sofa seat"],
+                  ["Oven Deep Clean",        "£60/oven"     ],
+                  ["Painting & Decoration",  "£200/room"    ],
+                  ["Man & Van",              "POA"          ],
+                  ["House Clearance",        "POA"          ],
+                  ["Plumbing & Heating",     "POA"          ],
                 ] as [string, string][]).map(([svc, price], i) => (
                   <tr key={svc} style={{ borderBottom: "1px solid #eef1f8", background: i % 2 === 1 ? "#fafbff" : "#fff" }}>
                     <td style={{ padding: "14px 20px", fontSize: 14, color: "#3d4a6b" }}>{svc}</td>
@@ -271,13 +341,13 @@ export default function HomePage() {
           </div>
           <div className="grid-3">
             {[
-              { icon: ShieldCheck,   title: "Fully Insured",              desc: "We carry comprehensive public liability insurance on every job." },
-              { icon: BadgeCheck,    title: "DBS-Checked Team",           desc: "All staff are background-checked and professionally trained." },
-              { icon: BadgeCheck,    title: "Waste Disposal Registered",  desc: "We are a fully licenced waste carrier — all waste disposed responsibly." },
-              { icon: Leaf,          title: "Eco-Friendly Products",      desc: "Safe for children, pets, and the environment." },
-              { icon: PoundSterling, title: "No Hidden Costs",            desc: "Upfront quotes — what we say is what you pay." },
-              { icon: Clock,         title: "Flexible Hours",             desc: "Evenings and weekends available to suit your schedule." },
-              { icon: Star,          title: "5-Star Rated",               desc: "Hundreds of satisfied customers across the region." },
+              { icon: ShieldCheck,   title: "Fully Insured",             desc: "We carry comprehensive public liability insurance on every job." },
+              { icon: BadgeCheck,    title: "DBS-Checked Team",          desc: "All staff are background-checked and professionally trained." },
+              { icon: BadgeCheck,    title: "Waste Disposal Registered", desc: "We are a fully licenced waste carrier — all waste disposed responsibly." },
+              { icon: Leaf,          title: "Eco-Friendly Products",     desc: "Safe for children, pets, and the environment." },
+              { icon: PoundSterling, title: "No Hidden Costs",           desc: "Upfront quotes — what we say is what you pay." },
+              { icon: Clock,         title: "Flexible Hours",            desc: "Evenings and weekends available to suit your schedule." },
+              { icon: Star,          title: "5-Star Rated",              desc: "Hundreds of satisfied customers across the region." },
             ].map(({ icon: Icon, title, desc }) => (
               <div key={title} style={{ display: "flex", gap: 16, alignItems: "flex-start", background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 14, padding: "24px 20px" }}>
                 <div style={{ background: "#e8f0ff", width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -413,14 +483,12 @@ export default function HomePage() {
       <footer style={{ background: "#0d1b3e", padding: "40px 0 28px" }}>
         <div className="container">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
-           
-         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-  <img src="/logo.jpg" alt="Jojo Property Services Ltd" style={{ height: 90, width: 90, borderRadius: 10, objectFit: "cover" }} />
-  <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 900, fontSize: 32, color: "#0d1b3e", lineHeight: 1.2 }}>
-    Jojo Property Services Ltd
-  </span>
-</div>
-            
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <img src="/logo.jpg" alt="Jojo Property Services Ltd" style={{ height: 60, width: 60, borderRadius: 10, objectFit: "cover" }} />
+              <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 18, color: "#fff" }}>
+                Jojo Property Services Ltd
+              </span>
+            </div>
             <p style={{ fontSize: 13, color: "#8a96b0" }}>Registered Company · Fully Insured · Waste Carrier Licensed</p>
             <p style={{ fontSize: 13, color: "#8a96b0" }}>© {new Date().getFullYear()} Jojo Property Services Ltd</p>
           </div>
