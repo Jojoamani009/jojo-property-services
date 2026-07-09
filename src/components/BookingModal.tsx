@@ -395,8 +395,8 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                 {/* Cleaners */}
                 <div style={configCard}>
                   <div style={configLabel}><Users size={14} /> Number of Cleaners</div>
-                  <Counter value={cleaners} min={selected.minCleaners} max={selected.maxCleaners} onChange={setCleaners} label="Cleaners" />
-                  {cleaners > 1 && (
+                 <Counter value={cleaners ?? selected.minCleaners ?? 1} min={selected.minCleaners ?? 1} max={selected.maxCleaners ?? 10} onChange={setCleaners} label="Cleaners" />                  
+                 {(cleaners ?? 0) > 1 && (
                     <div style={{ fontSize: 12, color: "#059669", marginTop: 8, display: "flex", gap: 5, alignItems: "center" }}>
                       <CheckCircle2 size={12} /> {cleaners} cleaners — job completed ~{Math.ceil(1 / cleaners * 100)}% faster
                     </div>
