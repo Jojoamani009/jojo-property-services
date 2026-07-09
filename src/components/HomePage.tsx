@@ -457,7 +457,8 @@ export default function HomePage() {
                 <p style={{ color: "#5a6782", marginTop: 8, fontSize: 15 }}>We'll call or email you shortly.</p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <form name="contact" method="POST" data-netlify="true" onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <input type="hidden" name="form-name" value="contact" />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <input name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} />
                   <input name="phone" placeholder="Phone Number" required value={formData.phone} onChange={handleChange} />
