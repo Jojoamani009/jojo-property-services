@@ -7,21 +7,20 @@ import {
   Wrench, Leaf, Star, Info, Plus, Minus, MapPin, Phone, Mail,
 } from "lucide-react";
 
-// ─── Service catalogue ────────────────────────────────────────────────────────
 const SERVICES = [
   {
     id: "domestic",
-  icon: Home,
-  label: "Domestic Cleaning",
-  desc: "Regular or one-off home clean",
-  type: "hourly",
-  ratePerCleaner: 20,
-  minHours: 2,
-  maxHours: 8,
-  minCleaners: 1,
-  maxCleaners: 4,
-  color: "#1a6bff",
-  bg: "#e8f0ff",
+    icon: Home,
+    label: "Domestic Cleaning",
+    desc: "Regular or one-off home clean",
+    type: "hourly",
+    ratePerCleaner: 20,
+    minHours: 2,
+    maxHours: 8,
+    minCleaners: 1,
+    maxCleaners: 4,
+    color: "#1a6bff",
+    bg: "#e8f0ff",
   },
   {
     id: "commercial",
@@ -38,13 +37,12 @@ const SERVICES = [
     bg: "#e0f2fe",
   },
   {
-    id: "endoftenancy",
+    id: "tenancy",
     icon: CheckCircle2,
     label: "End of Tenancy",
-    desc: "Guaranteed deposit-back clean. One Bedroom house/flat end of tenancy, from £140",
-    type: "fixed",
-    basePrice: 140,
-    extraPerCleaner: 40,
+    desc: "Guaranteed deposit-back clean",
+    type: "tenancy",
+    prices: { studio: 140, two: 160, three: 210, four: 280 },
     minCleaners: 1,
     maxCleaners: 3,
     color: "#7c3aed",
@@ -68,10 +66,9 @@ const SERVICES = [
     id: "oven",
     icon: Flame,
     label: "Oven Cleaning",
-    desc: "Professional degreasing. standard oven: £60, double range: £75",
-    type: "fixed",
-    basePrice: 60,
-    extraPerCleaner: 0,
+    desc: "Professional degreasing",
+    type: "oven",
+    prices: { standard: 70, double: 75 },
     minCleaners: 1,
     maxCleaners: 2,
     color: "#dc2626",
@@ -83,65 +80,84 @@ const SERVICES = [
     label: "Man & Van",
     desc: "Local moves & collections",
     type: "poa",
-    minCleaner: 1,
-    maxCleaner: 2,
+    minCleaners: 1,
+    maxCleaners: 2,
     color: "#d97706",
     bg: "#fef3c7",
   },
   {
     id: "clearance",
-  icon: Home,
-  label: "House Clearance",
-  desc: "Garage, shed & garden cleared",
-  type: "poa",
-  minCleaners: 2,
-  maxCleaners: 5,
-  color: "#0f766e",
-  bg: "#ccfbf1",
+    icon: Home,
+    label: "House Clearance",
+    desc: "Garage, shed & garden cleared",
+    type: "poa",
+    minCleaners: 2,
+    maxCleaners: 5,
+    color: "#0f766e",
+    bg: "#ccfbf1",
   },
   {
     id: "maintenance",
-  icon: Wrench,
-  label: "Property Maintenance",
-  desc: "General repairs, garden maintenance & upkeep",
-  type: "poa",
-  minCleaner: 1,
-  maxCleaner: 3,
-  color: "#4f46e5",
-  bg: "#e0e7ff",
+    icon: Wrench,
+    label: "Property Maintenance",
+    desc: "General repairs, garden maintenance & upkeep",
+    type: "poa",
+    minCleaners: 1,
+    maxCleaners: 3,
+    color: "#4f46e5",
+    bg: "#e0e7ff",
   },
   {
     id: "plumbing",
-  icon: Leaf,
-  label: "Plumbing & Heating",
-  desc: "Qualified tradespeople",
-  type: "poa",
-  minCleaner: 1,
-  maxCleaner: 2,
-  color: "#be185d",
-  bg: "#fce7f3",
+    icon: Leaf,
+    label: "Plumbing & Heating",
+    desc: "Qualified tradespeople",
+    type: "poa",
+    minCleaners: 1,
+    maxCleaners: 2,
+    color: "#be185d",
+    bg: "#fce7f3",
   },
 ];
 
 const ADDONS = [
-  { id: "linen hire & laundry", label: "Linen hire & laundry for (2bedroom)", price: 50 },
-  { id: "linen hire & laundry service", label: "Linen hire & laundry for (3bedroom)", price: 75 },
-  { id: "linen hire", label: "Linen hire & laundry for (4bedroom)", price: 100 },
+  { id: "linen2", label: "Linen hire & laundry for (2bedroom)", price: 50 },
+  { id: "linen3", label: "Linen hire & laundry for (3bedroom)", price: 75 },
+  { id: "linen4", label: "Linen hire & laundry for (4bedroom)", price: 100 },
   { id: "weekend", label: "Weekend / Bank Holiday Rate", price: 15 },
   { id: "express", label: "Same-Day / Express Booking", price: 25 },
   { id: "keys", label: "Key Collection & Return", price: 20 },
 ];
 
+const TENANCY_SIZES = [
+  { key: "studio", label: "Studio / 1 Bedroom", price: 140 },
+  { key: "two",    label: "2 Bedrooms",          price: 160 },
+  { key: "three",  label: "3 Bedrooms",          price: 210 },
+  { key: "four",   label: "4-5 Bedrooms",        price: 280 },
+];
+
+const OVEN_TYPES = [
+  { key: "standard", label: "Standard Oven",     price: 70 },
+  { key: "double",   label: "Double Range Oven", price: 75 },
+];
+
 type Service = (typeof SERVICES)[number];
 
-function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[]) {
+function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], tenancySize: string, ovenType: string) {
   let base = 0;
   if (svc.type === "hourly") {
     base = (svc as any).ratePerCleaner * cleaners * hours;
   } else if (svc.type === "fixed") {
-    base = (svc as any).basePrice + (svc as any).extraPerCleaner * (cleaners - 1);
+    base = (svc as any).basePrice + ((svc as any).extraPerCleaner ?? 0) * (cleaners - 1);
+  } else if (svc.type === "tenancy") {
+    const prices: Record<string, number> = { studio: 140, two: 160, three: 210, four: 280 };
+    base = prices[tenancySize] ?? 140;
+  } else if (svc.type === "oven") {
+    base = ovenType === "double" ? 75 : 70;
   } else if (svc.type === "perRoom") {
     base = (svc as any).ratePerRoom * rooms;
+  } else if (svc.type === "poa") {
+    base = 0;
   }
   const addonTotal = addons.reduce((sum, id) => {
     const a = ADDONS.find((x) => x.id === id);
@@ -150,7 +166,6 @@ function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number,
   return { base, addons: addonTotal, total: base + addonTotal };
 }
 
-// ─── Today + 60 days date helpers ────────────────────────────────────────────
 function getDates() {
   const dates: { label: string; value: string; day: string }[] = [];
   const now = new Date();
@@ -170,7 +185,6 @@ const TIMES = [
   "13:00","14:00","15:00","16:00","17:00","18:00",
 ];
 
-// ─── Stepper counter ──────────────────────────────────────────────────────────
 function Counter({ value, min, max, onChange, label }: {
   value: number; min: number; max: number;
   onChange: (n: number) => void; label: string;
@@ -196,8 +210,7 @@ function Counter({ value, min, max, onChange, label }: {
   );
 }
 
-// ─── Price summary pill ───────────────────────────────────────────────────────
-function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms }: any) {
+function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, tenancyLabel, ovenLabel }: any) {
   return (
     <div style={{ background: "linear-gradient(135deg,#1a6bff,#0f4ac4)", borderRadius: 16, padding: "20px 24px", color: "#fff", marginTop: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -207,7 +220,10 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
           <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
             {type === "hourly" && `£${rate}/hr × ${cleaners} cleaner${cleaners > 1 ? "s" : ""} × ${hours} hr${hours > 1 ? "s" : ""}`}
             {type === "fixed" && "Fixed price service"}
+            {type === "tenancy" && `End of Tenancy — ${tenancyLabel}`}
+            {type === "oven" && `Oven Cleaning — ${ovenLabel}`}
             {type === "perRoom" && `£${rate}/room × ${rooms} room${rooms > 1 ? "s" : ""}`}
+            {type === "poa" && "Price on application"}
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -225,29 +241,33 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
   );
 }
 
-// ─── Main booking flow ────────────────────────────────────────────────────────
 export default function BookingModal({ onClose }: { onClose?: () => void }) {
-  const [step, setStep] = useState(1); // 1=service 2=config 3=datetime 4=details 5=confirm
+  const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<Service | null>(null);
   const [hours, setHours] = useState(3);
   const [cleaners, setCleaners] = useState(1);
   const [rooms, setRooms] = useState(2);
   const [addons, setAddons] = useState<string[]>([]);
+  const [tenancySize, setTenancySize] = useState("studio");
+  const [ovenType, setOvenType] = useState("standard");
   const [date, setDate] = useState(getDates()[1].value);
   const [time, setTime] = useState("09:00");
   const [details, setDetails] = useState({ name: "", email: "", phone: "", address: "", notes: "" });
   const [submitted, setSubmitted] = useState(false);
 
   const dates = getDates();
-  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons) : null;
+  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, tenancySize, ovenType) : null;
+  const tenancyLabel = TENANCY_SIZES.find(s => s.key === tenancySize)?.label ?? "";
+  const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
 
-  // reset config when service changes
   useEffect(() => {
     if (!selected) return;
     setHours((selected as any).minHours ?? 1);
     setCleaners((selected as any).minCleaners ?? 1);
     setRooms(1);
     setAddons([]);
+    setTenancySize("studio");
+    setOvenType("standard");
   }, [selected]);
 
   const toggleAddon = (id: string) =>
@@ -257,13 +277,12 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
 
   const canNext = () => {
     if (step === 1) return !!selected;
-    if (step === 4) return details.name && details.phone && details.address;
+    if (step === 4) return !!(details.name && details.phone && details.address);
     return true;
   };
 
   const handleSubmit = () => setSubmitted(true);
 
-  // ── Confirmed screen ──
   if (submitted) {
     return (
       <div style={modalWrap}>
@@ -282,7 +301,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
               ["Date", new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })],
               ["Time", time],
               ["Address", details.address],
-              ["Total", `£${price?.total.toFixed(2)}`],
+              ["Total", price?.total === 0 ? "POA" : `£${price?.total.toFixed(2)}`],
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "5px 0", borderBottom: "1px solid #eef1f8" }}>
                 <span style={{ color: "#8a96b0" }}>{k}</span>
@@ -332,7 +351,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
         {/* Body */}
         <div style={{ padding: "24px 28px", overflowY: "auto", maxHeight: "calc(100vh - 280px)" }}>
 
-          {/* STEP 1: Service selection */}
+          {/* STEP 1 */}
           {step === 1 && (
             <div>
               <h3 style={stepTitle}>What service do you need?</h3>
@@ -352,7 +371,10 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                         <div style={{ fontSize: 12, fontWeight: 700, color: svc.color, marginTop: 4 }}>
                           {svc.type === "hourly" && `£${(svc as any).ratePerCleaner}/hr per cleaner`}
                           {svc.type === "fixed" && `From £${(svc as any).basePrice}`}
+                          {svc.type === "tenancy" && "From £140"}
+                          {svc.type === "oven" && "From £70"}
                           {svc.type === "perRoom" && `£${(svc as any).ratePerRoom}/room`}
+                          {svc.type === "poa" && "Price on Application"}
                         </div>
                       </div>
                     </button>
@@ -362,7 +384,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* STEP 2: Configure */}
+          {/* STEP 2 */}
           {step === 2 && selected && (
             <div>
               <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 20 }}>
@@ -376,11 +398,44 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+
+                {/* Tenancy bedroom selector */}
+                {selected.type === "tenancy" && (
+                  <div style={configCard}>
+                    <div style={configLabel}>🏠 Property Size</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                      {TENANCY_SIZES.map(({ key, label, price: p }) => (
+                        <button key={key} onClick={() => setTenancySize(key)}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: `2px solid ${tenancySize === key ? "#7c3aed" : "#eef1f8"}`, borderRadius: 10, background: tenancySize === key ? "#ede9fe" : "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{label}</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#7c3aed" }}>£{p}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Oven type selector */}
+                {selected.type === "oven" && (
+                  <div style={configCard}>
+                    <div style={configLabel}>🔥 Oven Type</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                      {OVEN_TYPES.map(({ key, label, price: p }) => (
+                        <button key={key} onClick={() => setOvenType(key)}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: `2px solid ${ovenType === key ? "#dc2626" : "#eef1f8"}`, borderRadius: 10, background: ovenType === key ? "#fee2e2" : "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{label}</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#dc2626" }}>£{p}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Hourly controls */}
                 {selected.type === "hourly" && (
                   <div style={configCard}>
                     <div style={configLabel}><Clock size={14} /> Duration</div>
-                    <Counter value={hours} min={(selected as any).minHours} max={(selected as any).maxHours} onChange={setHours} label="Hours" />
+                    <Counter value={hours} min={(selected as any).minHours ?? 1} max={(selected as any).maxHours ?? 8} onChange={setHours} label="Hours" />
                   </div>
                 )}
 
@@ -388,20 +443,36 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                 {selected.type === "perRoom" && (
                   <div style={configCard}>
                     <div style={configLabel}><Home size={14} /> Rooms / Areas</div>
-                    <Counter value={rooms} min={1} max={(selected as any).maxRooms} onChange={setRooms} label="Rooms" />
+                    <Counter value={rooms} min={1} max={(selected as any).maxRooms ?? 10} onChange={setRooms} label="Rooms" />
+                  </div>
+                )}
+
+                {/* POA notice */}
+                {selected.type === "poa" && (
+                  <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", textAlign: "center" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: "#5a6782" }}>Price on Application</div>
+                    <div style={{ fontSize: 13, color: "#8a96b0", marginTop: 4 }}>We'll provide a tailored quote after reviewing your requirements.</div>
                   </div>
                 )}
 
                 {/* Cleaners */}
-                <div style={configCard}>
-                  <div style={configLabel}><Users size={14} /> Number of Cleaners</div>
-                 <Counter value={cleaners ?? selected.minCleaners ?? 1} min={selected.minCleaners ?? 1} max={selected.maxCleaners ?? 10} onChange={setCleaners} label="Cleaners" />                  
-                 {(cleaners ?? 0) > 1 && (
-                    <div style={{ fontSize: 12, color: "#059669", marginTop: 8, display: "flex", gap: 5, alignItems: "center" }}>
-                      <CheckCircle2 size={12} /> {cleaners} cleaners — job completed ~{Math.ceil(1 / cleaners * 100)}% faster
-                    </div>
-                  )}
-                </div>
+                {selected.type !== "poa" && (
+                  <div style={configCard}>
+                    <div style={configLabel}><Users size={14} /> Number of Cleaners</div>
+                    <Counter
+                      value={cleaners ?? (selected as any).minCleaners ?? 1}
+                      min={(selected as any).minCleaners ?? 1}
+                      max={(selected as any).maxCleaners ?? 10}
+                      onChange={setCleaners}
+                      label="Cleaners"
+                    />
+                    {(cleaners ?? 0) > 1 && (
+                      <div style={{ fontSize: 12, color: "#059669", marginTop: 8, display: "flex", gap: 5, alignItems: "center" }}>
+                        <CheckCircle2 size={12} /> {cleaners} cleaners — job completed faster
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Add-ons */}
                 <div style={configCard}>
@@ -420,7 +491,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
               </div>
 
               {/* Live price */}
-              {price && (
+              {price && selected.type !== "poa" && (
                 <div style={{ marginTop: 16 }}>
                   <PriceSummary
                     base={price.base}
@@ -431,18 +502,18 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                     cleaners={cleaners}
                     hours={hours}
                     rooms={rooms}
+                    tenancyLabel={tenancyLabel}
+                    ovenLabel={ovenLabel}
                   />
                 </div>
               )}
             </div>
           )}
 
-          {/* STEP 3: Date & Time */}
+          {/* STEP 3 */}
           {step === 3 && (
             <div>
               <h3 style={stepTitle}>When would you like us?</h3>
-
-              {/* Date scroll */}
               <div style={{ marginTop: 16 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#5a6782", marginBottom: 10 }}>Select a Date</div>
                 <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 8 }}>
@@ -456,8 +527,6 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                   ))}
                 </div>
               </div>
-
-              {/* Time grid */}
               <div style={{ marginTop: 20 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#5a6782", marginBottom: 10 }}>Select a Start Time</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
@@ -469,8 +538,6 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                   ))}
                 </div>
               </div>
-
-              {/* Summary pill */}
               <div style={{ marginTop: 20, background: "#f5f8ff", borderRadius: 12, padding: "14px 18px", display: "flex", gap: 16, flexWrap: "wrap" }}>
                 <div style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 14, color: "#3d4a6b" }}>
                   <Calendar size={15} color="#1a6bff" />
@@ -479,20 +546,20 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                 <div style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 14, color: "#3d4a6b" }}>
                   <Clock size={15} color="#1a6bff" />
                   <strong>{time}</strong>
-                  {selected?.type === "hourly" && <span style={{ color: "#8a96b0" }}>→ est. finish {
-                    (() => {
+                  {selected?.type === "hourly" && (
+                    <span style={{ color: "#8a96b0" }}>→ est. finish {(() => {
                       const [h, m] = time.split(":").map(Number);
                       const end = new Date();
                       end.setHours(h + hours, m);
                       return end.toTimeString().slice(0, 5);
-                    })()
-                  }</span>}
+                    })()}</span>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* STEP 4: Customer details */}
+          {/* STEP 4 */}
           {step === 4 && (
             <div>
               <h3 style={stepTitle}>Your Details</h3>
@@ -523,12 +590,11 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
             </div>
           )}
 
-          {/* STEP 5: Review & Confirm */}
+          {/* STEP 5 */}
           {step === 5 && selected && price && (
             <div>
               <h3 style={stepTitle}>Review Your Booking</h3>
               <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
-                {/* Service block */}
                 <div style={reviewCard}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                     <div style={{ width: 36, height: 36, background: selected.bg, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -538,36 +604,44 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {selected.type === "hourly" && <ReviewRow label="Duration" value={`${hours} hour${hours > 1 ? "s" : ""}`} />}
+                    {selected.type === "tenancy" && <ReviewRow label="Property Size" value={tenancyLabel} />}
+                    {selected.type === "oven" && <ReviewRow label="Oven Type" value={ovenLabel} />}
                     {selected.type === "perRoom" && <ReviewRow label="Rooms" value={`${rooms} room${rooms > 1 ? "s" : ""}`} />}
-                    <ReviewRow label="Cleaners" value={`${cleaners} cleaner${cleaners > 1 ? "s" : ""}`} />
+                    {selected.type !== "poa" && <ReviewRow label="Cleaners" value={`${cleaners} cleaner${cleaners > 1 ? "s" : ""}`} />}
                     {addons.length > 0 && <ReviewRow label="Add-ons" value={addons.map((id) => ADDONS.find((a) => a.id === id)?.label).join(", ")} />}
                   </div>
                 </div>
 
-                {/* Datetime block */}
                 <div style={reviewCard}>
                   <ReviewRow icon={<Calendar size={14} />} label="Date" value={new Date(date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} />
                   <ReviewRow icon={<Clock size={14} />} label="Time" value={time} />
                 </div>
 
-                {/* Address */}
                 <div style={reviewCard}>
                   <ReviewRow icon={<MapPin size={14} />} label="Address" value={details.address} />
                   <ReviewRow icon={<Phone size={14} />} label="Phone" value={details.phone} />
                   {details.email && <ReviewRow icon={<Mail size={14} />} label="Email" value={details.email} />}
                 </div>
 
-                {/* Price breakdown */}
-                <PriceSummary
-                  base={price.base}
-                  addonsTotal={price.addons}
-                  total={price.total}
-                  type={selected.type}
-                  rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : (selected as any).ratePerRoom}
-                  cleaners={cleaners}
-                  hours={hours}
-                  rooms={rooms}
-                />
+                {selected.type !== "poa" ? (
+                  <PriceSummary
+                    base={price.base}
+                    addonsTotal={price.addons}
+                    total={price.total}
+                    type={selected.type}
+                    rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : (selected as any).ratePerRoom}
+                    cleaners={cleaners}
+                    hours={hours}
+                    rooms={rooms}
+                    tenancyLabel={tenancyLabel}
+                    ovenLabel={ovenLabel}
+                  />
+                ) : (
+                  <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", textAlign: "center" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: "#5a6782" }}>Price on Application</div>
+                    <div style={{ fontSize: 13, color: "#8a96b0", marginTop: 4 }}>We'll confirm pricing before work begins.</div>
+                  </div>
+                )}
 
                 <div style={{ display: "flex", gap: 6, alignItems: "flex-start", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "12px 14px", marginTop: 4 }}>
                   <Info size={14} color="#d97706" style={{ flexShrink: 0, marginTop: 1 }} />
@@ -588,8 +662,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
             <ChevronLeft size={16} /> Back
           </button>
 
-          {/* Live price badge mid-nav */}
-          {price && step > 1 && step < 5 && (
+          {price && step > 1 && step < 5 && selected?.type !== "poa" && (
             <div style={{ background: "#e8f0ff", borderRadius: 8, padding: "8px 14px", fontSize: 14, fontWeight: 700, color: "#1a6bff" }}>
               £{price.total.toFixed(2)}
             </div>
@@ -612,7 +685,6 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
   );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
 function ReviewRow({ label, value, icon }: { label: string; value?: string; icon?: React.ReactNode }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 16, fontSize: 13, padding: "4px 0", borderBottom: "1px solid #f0f3f9" }}>
@@ -622,7 +694,6 @@ function ReviewRow({ label, value, icon }: { label: string; value?: string; icon
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
 const modalWrap: React.CSSProperties = {
   position: "fixed", inset: 0, background: "rgba(13,27,62,0.55)",
   display: "flex", alignItems: "center", justifyContent: "center",
