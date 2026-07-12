@@ -1,4 +1,5 @@
 "use client";
+import emailjs from "@emailjs/browser";
 
 import { useState, useEffect } from "react";
 import {
@@ -281,7 +282,55 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
     return true;
   };
 
-  const handleSubmit = () => setSubmitted(true);
+  const handleSubmit = async () => {
+  try {
+    await emailjs.send(
+      "service_vgitf2j",
+      "template_41nlzdn",
+      {
+        name: details.name,
+        phone: details.phone,
+        email: details.email,
+        address: details.address,
+        service: selected?.label ?? "",
+        date: new Date(date).toLocaleDateString("en-GB", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        }),
+        time: time,
+        details:
+          selected?.type === "tenancy"
+            ? tenancyLabel
+            : selected?.type === "oven"
+            ? ovenLabel
+            : "",
+        cleaners:
+          selected?.type !== "poa"
+            ? `${cleaners} cleaner${cleaners > 1 ? "s" : ""}`
+            : "TBC",
+        addons:
+          addons.length > 0
+            ? addons
+                .map((id) => ADDONS.find((a) => a.id === id)?.label)
+                .join(", ")
+            : "None",
+        price:
+          price?.total === 0
+            ? "POA"
+            : `£${price?.total.toFixed(2)}`,
+        notes: details.notes || "None",
+      },
+      "Zd2QJQZ7GXWqDTblv"
+    );
+
+    setSubmitted(true);
+  } catch (err) {
+    console.error("EmailJS booking error:", err);
+    alert("There was a problem sending your booking. Please try again.");
+  }
+};
 
   if (submitted) {
     return (
@@ -302,6 +351,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
               ["Time", time],
               ["Address", details.address],
               ["Total", price?.total === 0 ? "POA" : `£${price?.total.toFixed(2)}`],
+              
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "5px 0", borderBottom: "1px solid #eef1f8" }}>
                 <span style={{ color: "#8a96b0" }}>{k}</span>
