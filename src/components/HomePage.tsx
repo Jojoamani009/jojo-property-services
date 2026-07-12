@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import emailjs from "@emailjs/browser";
 import {
   ShieldCheck, BadgeCheck, Clock, PoundSterling,
   Phone, Mail, MapPin, Star, CheckCircle2, Sparkles,
@@ -8,8 +9,12 @@ import {
   Brush,
 } from "lucide-react";
 
+const EMAILJS_SERVICE  = "service_vgitf2j";
+const EMAILJS_TEMPLATE = "template_8m8vbss";
+const EMAILJS_KEY      = "Zd2QJQZ7GXWqDTblv";
+
 const BRAND = {
-  name: "Jojo Cleaning & Clearance",
+  name: "Jojo Property Services Ltd",
   phone: "07305851573",
   email: "info@jojocleaningservice.co.uk",
 };
@@ -57,11 +62,32 @@ const EMPTY_FORM: FormData = { name: "", phone: "", email: "", postcode: "", dat
 export default function HomePage() {
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const [calcHours, setCalcHours] = useState(2);
   const [calcCleaners, setCalcCleaners] = useState(1);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSending(true);
+    try {
+      await emailjs.send(
+        EMAILJS_SERVICE,
+        EMAILJS_TEMPLATE,
+        {
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          postcode: formData.postcode,
+          date: formData.date,
+          service: formData.service,
+          message: formData.message,
+        },
+        EMAILJS_KEY
+      );
+    } catch (err) {
+      console.error("EmailJS error:", err);
+    }
+    setSending(false);
     setSubmitted(true);
   };
 
@@ -163,7 +189,7 @@ export default function HomePage() {
                 <option value="commercial">Commercial Cleaning — £25/hr per cleaner</option>
                 <option value="tenancy">End of Tenancy — From £140</option>
                 <option value="carpet">Carpet & Upholstery — £70/room</option>
-                <option value="oven">Oven Cleaning — £60/oven</option>
+                <option value="oven">Oven Cleaning — From £70</option>
                 <option value="manvan">Man & Van — POA</option>
                 <option value="clearance">House Clearance — POA</option>
                 <option value="maintenance">Property Maintenance — POA</option>
@@ -204,7 +230,7 @@ export default function HomePage() {
                         formData.service === "commercial" ? calcHours * calcCleaners * 25 :
                         formData.service === "tenancy" ? 140 :
                         formData.service === "carpet" ? 70 :
-                        formData.service === "oven" ? 60 : 0
+                        formData.service === "oven" ? 70 : 0
                       }
                     </div>
                     <div style={{ fontSize: 13, color: "#8a96b0", marginTop: 4 }}>
@@ -315,7 +341,7 @@ export default function HomePage() {
                   ["End of Tenancy (1-bed)", "£140"         ],
                   ["Carpet Deep Clean",      "£70/room"     ],
                   ["Sofa Deep Clean",        "£30/sofa seat"],
-                  ["Oven Deep Clean",        "£60/oven"     ],
+                  ["Oven Deep Clean",        "£70/oven"     ],
                   ["Painting & Decoration",  "£200/room"    ],
                   ["Man & Van",              "POA"          ],
                   ["House Clearance",        "POA"          ],
@@ -457,8 +483,7 @@ export default function HomePage() {
                 <p style={{ color: "#5a6782", marginTop: 8, fontSize: 15 }}>We'll call or email you shortly.</p>
               </div>
             ) : (
-              <form name="contact" method="POST" data-netlify="true" onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <input type="hidden" name="form-name" value="contact" />
+              <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                   <input name="name" placeholder="Full Name" required value={formData.name} onChange={handleChange} />
                   <input name="phone" placeholder="Phone Number" required value={formData.phone} onChange={handleChange} />
@@ -472,7 +497,9 @@ export default function HomePage() {
                   {services.map((s) => <option key={s.label} value={s.label}>{s.label}</option>)}
                 </select>
                 <textarea name="message" placeholder="Tell us about your requirements..." rows={4} value={formData.message} onChange={handleChange} />
-                <button type="submit" className="btn-primary">Send Quote Request</button>
+                <button type="submit" className="btn-primary" disabled={sending}>
+                  {sending ? "Sending..." : "Send Quote Request"}
+                </button>
                 <p style={{ fontSize: 12, color: "#9aa5be", textAlign: "center" }}>No obligation. We'll respond within a few hours.</p>
               </form>
             )}
