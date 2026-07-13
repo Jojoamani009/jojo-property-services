@@ -16,7 +16,7 @@ const EMAILJS_KEY      = "Zd2QJQZ7GXWqDTblv";
 const BRAND = {
   name: "Jojo Property Services Ltd",
   phone: "07305851573",
-  email: "info@jojocleaningservice.co.uk",
+  email: "info@jojopropertyservices.co.uk",
 };
 
 const services = [
