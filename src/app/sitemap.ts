@@ -20,5 +20,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "https://jojopropertyservices.co.uk/contact",
       lastModified: new Date(),
     },
+    {
+      url: "https://jojopropertyservices.co.uk/reviews",
+      lastModified: new Date(),
+    },
+    {
+      url: "https://jojopropertyservices.co.uk/contact",
+      lastModified: new Date(),
+    },
   ];
 }
