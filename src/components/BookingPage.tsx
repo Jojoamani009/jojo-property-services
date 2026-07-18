@@ -5,24 +5,36 @@ import Link from "next/link";
 import BookingModal from "./BookingModal";
 import {
   Home, Building2, CheckCircle2, Sparkles, Flame,
-  Truck, Wrench, Leaf, Star, ArrowRight, ArrowLeft, Brush,
+  Truck, Wrench, Leaf, Star, ArrowRight, ArrowLeft, Brush, Armchair,
 } from "lucide-react";
 
 const CARDS = [
-  { icon: Home,         label: "Domestic Clean",     badge: "Most Popular", rate: "£20/hr ", color: "#1a6bff", bg: "#e8f0ff" },
-  { icon: Building2,    label: "Commercial Clean",   badge: null,           rate: "£25/hr ", color: "#0891b2", bg: "#e0f2fe" },
-  { icon: CheckCircle2, label: "End of Tenancy Clean",        badge: "Fixed Price (1-bed house/flat",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
-  { icon: Sparkles,     label: "Carpet & Upholstery Clean",   badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
-  { icon: Flame,        label: "Oven Clean",         badge: "Fixed Price",  rate: "£60/oven",           color: "#dc2626", bg: "#fee2e2" },
-  { icon: Truck,        label: "Man & Van",             badge: null,           rate: "POA",                color: "#d97706", bg: "#fef3c7" },
-  { icon: Home,         label: "Clearance Service",     badge: null,           rate: "POA",                color: "#0f766e", bg: "#ccfbf1" },
-  { icon: Wrench,       label: "Property Maintenance",  badge: null,           rate: "POA",                color: "#4f46e5", bg: "#e0e7ff" },
-  { icon: Leaf,         label: "Plumbing & Heating",    badge: null,           rate: "POA",                color: "#be185d", bg: "#fce7f3" },
-  { icon: Brush,        label: "Painting & Decoration", badge: null,           rate: "£200/room",          color: "#b45309", bg: "#fff7ed" },
+  { id: "domestic",    icon: Home,         label: "Domestic Clean",     badge: "Most Popular", rate: "£20/hr ", color: "#1a6bff", bg: "#e8f0ff" },
+  { id: "commercial",  icon: Building2,    label: "Commercial Clean",   badge: null,           rate: "£25/hr ", color: "#0891b2", bg: "#e0f2fe" },
+  { id: "tenancy",     icon: CheckCircle2, label: "End of Tenancy Clean",        badge: "Fixed Price (1-bed house/flat",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
+  { id: "carpet",      icon: Sparkles,     label: "Carpet & Upholstery Clean",   badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
+  { id: "oven",        icon: Flame,        label: "Oven Clean",         badge: "Fixed Price",  rate: "From £70",           color: "#dc2626", bg: "#fee2e2" },
+  { id: "manvan",      icon: Truck,        label: "Man & Van",             badge: null,           rate: "POA",                color: "#d97706", bg: "#fef3c7" },
+  { id: "clearance",   icon: Home,         label: "Clearance Service",     badge: null,           rate: "POA",                color: "#0f766e", bg: "#ccfbf1" },
+  { id: "maintenance", icon: Wrench,       label: "Property Maintenance",  badge: null,           rate: "POA",                color: "#4f46e5", bg: "#e0e7ff" },
+  { id: "plumbing",    icon: Leaf,         label: "Plumbing & Heating",    badge: null,           rate: "POA",                color: "#be185d", bg: "#fce7f3" },
+  { id: "painting",    icon: Brush,        label: "Painting & Decoration", badge: null,           rate: "£200/room",          color: "#b45309", bg: "#fff7ed" },
+  { id: "sofa",        icon: Armchair,     label: "Sofa Deep Clean",       badge: null,           rate: "£30/seat",           color: "#0284c7", bg: "#e0f2fe" },
 ];
 
 export default function BookingPage() {
   const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | undefined>(undefined);
+
+  const handleBookNow = (id: string) => {
+    setSelectedId(id);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedId(undefined);
+  };
 
   return (
     <>
@@ -72,7 +84,7 @@ export default function BookingPage() {
           Our Services
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
-          {CARDS.map(({ icon: Icon, label, badge, rate, color, bg }) => (
+          {CARDS.map(({ id, icon: Icon, label, badge, rate, color, bg }) => (
             <div key={label} className="card"
               style={{ background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 16, padding: "24px 22px", display: "flex", flexDirection: "column", gap: 0, transition: "box-shadow 0.2s, border-color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.boxShadow = `0 4px 24px ${color}22`; }}
@@ -100,7 +112,7 @@ export default function BookingPage() {
                 {rate}
               </div>
 
-              <button onClick={() => setOpen(true)}
+              <button onClick={() => handleBookNow(id)}
                 style={{ marginTop: 16, width: "100%", background: color, color: "#fff", border: "none", borderRadius: 10, padding: "12px 0", fontWeight: 700, fontSize: 14, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "opacity 0.15s" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.88"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}>
@@ -114,7 +126,7 @@ export default function BookingPage() {
         </div>
       </section>
 
-      {open && <BookingModal onClose={() => setOpen(false)} />}
+      {open && <BookingModal onClose={handleClose} initialServiceId={selectedId} />}
     </>
   );
 }

@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import {
   X, ChevronRight, ChevronLeft, Clock, Users, Calendar,
   CheckCircle2, Sparkles, Home, Building2, Flame, Truck,
-  Wrench, Leaf, Star, Info, Plus, Minus, MapPin, Phone, Mail,
+  Wrench, Leaf, Star, Info, Plus, Minus, MapPin, Phone, Mail, Brush,
+  Armchair,
 } from "lucide-react";
 
 const SERVICES = [
@@ -101,7 +102,7 @@ const SERVICES = [
     id: "maintenance",
     icon: Wrench,
     label: "Property Maintenance",
-    desc: "General repairs, garden maintenance & upkeep",
+    desc: "General repairs, inspections, garden maintenance & upkeep",
     type: "poa",
     minCleaners: 1,
     maxCleaners: 3,
@@ -112,12 +113,40 @@ const SERVICES = [
     id: "plumbing",
     icon: Leaf,
     label: "Plumbing & Heating",
-    desc: "Qualified tradespeople",
+    desc: "Qualified tradespeople for general plumbing work",
     type: "poa",
     minCleaners: 1,
     maxCleaners: 2,
     color: "#be185d",
     bg: "#fce7f3",
+  },
+  {
+    id: "painting",
+    icon: Brush,
+    label: "Painting & Decoration",
+    desc: "Interior painting & decorating",
+    type: "perRoom",
+    ratePerRoom: 200,
+    minRooms: 1,
+    maxRooms: 10,
+    minCleaners: 1,
+    maxCleaners: 3,
+    color: "#b45309",
+    bg: "#fff7ed",
+  },
+  {
+    id: "sofa",
+    icon: Armchair,
+    label: "Sofa Deep Clean",
+    desc: "Professional upholstery & sofa cleaning",
+    type: "perSeat",
+    ratePerSeat: 30,
+    minSeats: 1,
+    maxSeats: 10,
+    minCleaners: 1,
+    maxCleaners: 2,
+    color: "#0284c7",
+    bg: "#e0f2fe",
   },
 ];
 
@@ -144,7 +173,7 @@ const OVEN_TYPES = [
 
 type Service = (typeof SERVICES)[number];
 
-function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], tenancySize: string, ovenType: string) {
+function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], tenancySize: string, ovenType: string, seats: number) {
   let base = 0;
   if (svc.type === "hourly") {
     base = (svc as any).ratePerCleaner * cleaners * hours;
@@ -157,6 +186,8 @@ function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number,
     base = ovenType === "double" ? 75 : 70;
   } else if (svc.type === "perRoom") {
     base = (svc as any).ratePerRoom * rooms;
+  } else if (svc.type === "perSeat") {
+    base = (svc as any).ratePerSeat * seats;
   } else if (svc.type === "poa") {
     base = 0;
   }
@@ -205,13 +236,13 @@ function Counter({ value, min, max, onChange, label }: {
         </button>
       </div>
       <span style={{ fontSize: 13, color: "#8a96b0", minWidth: 48, textAlign: "right" }}>
-        {label === "Cleaners" ? `×${value}` : label === "Rooms" ? `${value} rm` : `${value} hr`}
+        {label === "Cleaners" ? `×${value}` : label === "Rooms" ? `${value} rm` : label === "Seats" ? `${value} seat${value > 1 ? "s" : ""}` : `${value} hr`}
       </span>
     </div>
   );
 }
 
-function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, tenancyLabel, ovenLabel }: any) {
+function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, tenancyLabel, ovenLabel }: any) {
   return (
     <div style={{ background: "linear-gradient(135deg,#1a6bff,#0f4ac4)", borderRadius: 16, padding: "20px 24px", color: "#fff", marginTop: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -224,6 +255,7 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
             {type === "tenancy" && `End of Tenancy — ${tenancyLabel}`}
             {type === "oven" && `Oven Cleaning — ${ovenLabel}`}
             {type === "perRoom" && `£${rate}/room × ${rooms} room${rooms > 1 ? "s" : ""}`}
+            {type === "perSeat" && `£${rate}/seat × ${seats} seat${seats > 1 ? "s" : ""}`}
             {type === "poa" && "Price on application"}
           </div>
         </div>
@@ -242,12 +274,23 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
   );
 }
 
-export default function BookingModal({ onClose }: { onClose?: () => void }) {
-  const [step, setStep] = useState(1);
-  const [selected, setSelected] = useState<Service | null>(null);
+export default function BookingModal({
+  onClose,
+  initialServiceId,
+}: {
+  onClose?: () => void;
+  initialServiceId?: string;
+}) {
+  const initialService = initialServiceId
+    ? SERVICES.find((s) => s.id === initialServiceId) ?? null
+    : null;
+
+  const [step, setStep] = useState(initialService ? 2 : 1);
+  const [selected, setSelected] = useState<Service | null>(initialService);
   const [hours, setHours] = useState(3);
   const [cleaners, setCleaners] = useState(1);
   const [rooms, setRooms] = useState(2);
+  const [seats, setSeats] = useState(2);
   const [addons, setAddons] = useState<string[]>([]);
   const [tenancySize, setTenancySize] = useState("studio");
   const [ovenType, setOvenType] = useState("standard");
@@ -257,7 +300,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
   const [submitted, setSubmitted] = useState(false);
 
   const dates = getDates();
-  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, tenancySize, ovenType) : null;
+  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, tenancySize, ovenType, seats) : null;
   const tenancyLabel = TENANCY_SIZES.find(s => s.key === tenancySize)?.label ?? "";
   const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
 
@@ -266,6 +309,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
     setHours((selected as any).minHours ?? 1);
     setCleaners((selected as any).minCleaners ?? 1);
     setRooms(1);
+    setSeats(1);
     setAddons([]);
     setTenancySize("studio");
     setOvenType("standard");
@@ -305,7 +349,13 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
             ? tenancyLabel
             : selected?.type === "oven"
             ? ovenLabel
-            : "",
+            : selected?.type === "hourly"
+            ? `${hours} hour${hours > 1 ? "s" : ""}`
+            : selected?.type === "perRoom"
+            ? `${rooms} room${rooms > 1 ? "s" : ""}`
+            : selected?.type === "perSeat"
+            ? `${seats} seat${seats > 1 ? "s" : ""}`
+            : "N/A",
         cleaners:
           selected?.type !== "poa"
             ? `${cleaners} cleaner${cleaners > 1 ? "s" : ""}`
@@ -497,6 +547,14 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                   </div>
                 )}
 
+                {/* Per-seat control */}
+                {selected.type === "perSeat" && (
+                  <div style={configCard}>
+                    <div style={configLabel}><Armchair size={14} /> Sofa Seats</div>
+                    <Counter value={seats} min={1} max={(selected as any).maxSeats ?? 10} onChange={setSeats} label="Seats" />
+                  </div>
+                )}
+
                 {/* POA notice */}
                 {selected.type === "poa" && (
                   <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", textAlign: "center" }}>
@@ -548,10 +606,11 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                     addonsTotal={price.addons}
                     total={price.total}
                     type={selected.type}
-                    rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : (selected as any).ratePerRoom}
+                    rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : selected.type === "perSeat" ? (selected as any).ratePerSeat : (selected as any).ratePerRoom}
                     cleaners={cleaners}
                     hours={hours}
                     rooms={rooms}
+                    seats={seats}
                     tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
                   />
@@ -657,6 +716,7 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                     {selected.type === "tenancy" && <ReviewRow label="Property Size" value={tenancyLabel} />}
                     {selected.type === "oven" && <ReviewRow label="Oven Type" value={ovenLabel} />}
                     {selected.type === "perRoom" && <ReviewRow label="Rooms" value={`${rooms} room${rooms > 1 ? "s" : ""}`} />}
+                    {selected.type === "perSeat" && <ReviewRow label="Sofa Seats" value={`${seats} seat${seats > 1 ? "s" : ""}`} />}
                     {selected.type !== "poa" && <ReviewRow label="Cleaners" value={`${cleaners} cleaner${cleaners > 1 ? "s" : ""}`} />}
                     {addons.length > 0 && <ReviewRow label="Add-ons" value={addons.map((id) => ADDONS.find((a) => a.id === id)?.label).join(", ")} />}
                   </div>
@@ -679,10 +739,11 @@ export default function BookingModal({ onClose }: { onClose?: () => void }) {
                     addonsTotal={price.addons}
                     total={price.total}
                     type={selected.type}
-                    rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : (selected as any).ratePerRoom}
+                    rate={selected.type === "hourly" ? (selected as any).ratePerCleaner : selected.type === "perSeat" ? (selected as any).ratePerSeat : (selected as any).ratePerRoom}
                     cleaners={cleaners}
                     hours={hours}
                     rooms={rooms}
+                    seats={seats}
                     tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
                   />
