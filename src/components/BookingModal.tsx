@@ -21,6 +21,7 @@ const SERVICES = [
     maxHours: 8,
     minCleaners: 1,
     maxCleaners: 4,
+    staffLabel: "Cleaners",
     color: "#1a6bff",
     bg: "#e8f0ff",
   },
@@ -35,6 +36,7 @@ const SERVICES = [
     maxHours: 12,
     minCleaners: 1,
     maxCleaners: 10,
+    staffLabel: "Cleaners",
     color: "#0891b2",
     bg: "#e0f2fe",
   },
@@ -47,6 +49,7 @@ const SERVICES = [
     prices: { studio: 140, two: 160, three: 210, four: 280 },
     minCleaners: 1,
     maxCleaners: 3,
+    staffLabel: "Cleaners",
     color: "#7c3aed",
     bg: "#ede9fe",
   },
@@ -61,6 +64,7 @@ const SERVICES = [
     maxRooms: 10,
     minCleaners: 1,
     maxCleaners: 2,
+    staffLabel: "Cleaners",
     color: "#059669",
     bg: "#d1fae5",
   },
@@ -73,6 +77,7 @@ const SERVICES = [
     prices: { standard: 70, double: 75 },
     minCleaners: 1,
     maxCleaners: 2,
+    staffLabel: "Cleaners",
     color: "#dc2626",
     bg: "#fee2e2",
   },
@@ -84,6 +89,7 @@ const SERVICES = [
     type: "poa",
     minCleaners: 1,
     maxCleaners: 2,
+    staffLabel: "Team Members",
     color: "#d97706",
     bg: "#fef3c7",
   },
@@ -95,6 +101,7 @@ const SERVICES = [
     type: "poa",
     minCleaners: 2,
     maxCleaners: 5,
+    staffLabel: "Team Members",
     color: "#0f766e",
     bg: "#ccfbf1",
   },
@@ -106,6 +113,7 @@ const SERVICES = [
     type: "poa",
     minCleaners: 1,
     maxCleaners: 3,
+    staffLabel: "Tradespeople",
     color: "#4f46e5",
     bg: "#e0e7ff",
   },
@@ -117,6 +125,7 @@ const SERVICES = [
     type: "poa",
     minCleaners: 1,
     maxCleaners: 2,
+    staffLabel: "Tradespeople",
     color: "#be185d",
     bg: "#fce7f3",
   },
@@ -131,6 +140,7 @@ const SERVICES = [
     maxRooms: 10,
     minCleaners: 1,
     maxCleaners: 3,
+    staffLabel: "Painters",
     color: "#b45309",
     bg: "#fff7ed",
   },
@@ -145,6 +155,7 @@ const SERVICES = [
     maxSeats: 10,
     minCleaners: 1,
     maxCleaners: 2,
+    staffLabel: "Cleaners",
     color: "#0284c7",
     bg: "#e0f2fe",
   },
@@ -172,6 +183,25 @@ const OVEN_TYPES = [
 ];
 
 type Service = (typeof SERVICES)[number];
+
+// Returns the correct staff noun for a service (e.g. "Painters" for
+// Painting & Decoration, "Cleaners" for cleaning services), defaulting
+// to "Cleaners" if a service has no staffLabel set.
+function getStaffLabel(svc: Service | null): string {
+  return (svc as any)?.staffLabel ?? "Cleaners";
+}
+
+// Singular form of the staff label for grammatically correct counts,
+// e.g. "1 Painter" instead of "1 Painters".
+function getStaffLabelSingular(svc: Service | null): string {
+  const label = getStaffLabel(svc);
+  return label.endsWith("s") ? label.slice(0, -1) : label;
+}
+
+function formatStaffCount(svc: Service | null, count: number): string {
+  const label = count === 1 ? getStaffLabelSingular(svc) : getStaffLabel(svc);
+  return `${count} ${label.toLowerCase()}`;
+}
 
 function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], tenancySize: string, ovenType: string, seats: number) {
   let base = 0;
@@ -217,9 +247,9 @@ const TIMES = [
   "13:00","14:00","15:00","16:00","17:00","18:00",
 ];
 
-function Counter({ value, min, max, onChange, label }: {
+function Counter({ value, min, max, onChange, label, suffix }: {
   value: number; min: number; max: number;
-  onChange: (n: number) => void; label: string;
+  onChange: (n: number) => void; label: string; suffix?: string;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -236,13 +266,14 @@ function Counter({ value, min, max, onChange, label }: {
         </button>
       </div>
       <span style={{ fontSize: 13, color: "#8a96b0", minWidth: 48, textAlign: "right" }}>
-        {label === "Cleaners" ? `×${value}` : label === "Rooms" ? `${value} rm` : label === "Seats" ? `${value} seat${value > 1 ? "s" : ""}` : `${value} hr`}
+        {suffix ?? `${value}`}
       </span>
     </div>
   );
 }
 
-function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, tenancyLabel, ovenLabel }: any) {
+function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, tenancyLabel, ovenLabel, staffLabel }: any) {
+  const staffWord = (staffLabel ?? "Cleaners").toLowerCase();
   return (
     <div style={{ background: "linear-gradient(135deg,#1a6bff,#0f4ac4)", borderRadius: 16, padding: "20px 24px", color: "#fff", marginTop: 8 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -250,7 +281,7 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
           <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 4 }}>Estimated Total</div>
           <div style={{ fontSize: 36, fontWeight: 700, lineHeight: 1 }}>£{total.toFixed(2)}</div>
           <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
-            {type === "hourly" && `£${rate}/hr × ${cleaners} cleaner${cleaners > 1 ? "s" : ""} × ${hours} hr${hours > 1 ? "s" : ""}`}
+            {type === "hourly" && `£${rate}/hr × ${cleaners} ${staffWord} × ${hours} hr${hours > 1 ? "s" : ""}`}
             {type === "fixed" && "Fixed price service"}
             {type === "tenancy" && `End of Tenancy — ${tenancyLabel}`}
             {type === "oven" && `Oven Cleaning — ${ovenLabel}`}
@@ -303,6 +334,7 @@ export default function BookingModal({
   const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, tenancySize, ovenType, seats) : null;
   const tenancyLabel = TENANCY_SIZES.find(s => s.key === tenancySize)?.label ?? "";
   const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
+  const staffLabel = getStaffLabel(selected);
 
   useEffect(() => {
     if (!selected) return;
@@ -358,7 +390,7 @@ export default function BookingModal({
             : "N/A",
         cleaners:
           selected?.type !== "poa"
-            ? `${cleaners} cleaner${cleaners > 1 ? "s" : ""}`
+            ? formatStaffCount(selected, cleaners)
             : "TBC",
         addons:
           addons.length > 0
@@ -401,7 +433,7 @@ export default function BookingModal({
               ["Time", time],
               ["Address", details.address],
               ["Total", price?.total === 0 ? "POA" : `£${price?.total.toFixed(2)}`],
-              
+
             ].map(([k, v]) => (
               <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, padding: "5px 0", borderBottom: "1px solid #eef1f8" }}>
                 <span style={{ color: "#8a96b0" }}>{k}</span>
@@ -469,7 +501,7 @@ export default function BookingModal({
                         <div style={{ fontWeight: 600, fontSize: 13, color: "#0d1b3e" }}>{svc.label}</div>
                         <div style={{ fontSize: 12, color: "#8a96b0", marginTop: 2 }}>{svc.desc}</div>
                         <div style={{ fontSize: 12, fontWeight: 700, color: svc.color, marginTop: 4 }}>
-                          {svc.type === "hourly" && `£${(svc as any).ratePerCleaner}/hr per cleaner`}
+                          {svc.type === "hourly" && `£${(svc as any).ratePerCleaner}/hr per ${getStaffLabelSingular(svc).toLowerCase()}`}
                           {svc.type === "fixed" && `From £${(svc as any).basePrice}`}
                           {svc.type === "tenancy" && "From £140"}
                           {svc.type === "oven" && "From £70"}
@@ -535,7 +567,14 @@ export default function BookingModal({
                 {selected.type === "hourly" && (
                   <div style={configCard}>
                     <div style={configLabel}><Clock size={14} /> Duration</div>
-                    <Counter value={hours} min={(selected as any).minHours ?? 1} max={(selected as any).maxHours ?? 8} onChange={setHours} label="Hours" />
+                    <Counter
+                      value={hours}
+                      min={(selected as any).minHours ?? 1}
+                      max={(selected as any).maxHours ?? 8}
+                      onChange={setHours}
+                      label="Hours"
+                      suffix={`${hours} hr`}
+                    />
                   </div>
                 )}
 
@@ -543,7 +582,14 @@ export default function BookingModal({
                 {selected.type === "perRoom" && (
                   <div style={configCard}>
                     <div style={configLabel}><Home size={14} /> Rooms / Areas</div>
-                    <Counter value={rooms} min={1} max={(selected as any).maxRooms ?? 10} onChange={setRooms} label="Rooms" />
+                    <Counter
+                      value={rooms}
+                      min={1}
+                      max={(selected as any).maxRooms ?? 10}
+                      onChange={setRooms}
+                      label="Rooms"
+                      suffix={`${rooms} rm`}
+                    />
                   </div>
                 )}
 
@@ -551,7 +597,14 @@ export default function BookingModal({
                 {selected.type === "perSeat" && (
                   <div style={configCard}>
                     <div style={configLabel}><Armchair size={14} /> Sofa Seats</div>
-                    <Counter value={seats} min={1} max={(selected as any).maxSeats ?? 10} onChange={setSeats} label="Seats" />
+                    <Counter
+                      value={seats}
+                      min={1}
+                      max={(selected as any).maxSeats ?? 10}
+                      onChange={setSeats}
+                      label="Seats"
+                      suffix={`${seats} seat${seats > 1 ? "s" : ""}`}
+                    />
                   </div>
                 )}
 
@@ -563,20 +616,21 @@ export default function BookingModal({
                   </div>
                 )}
 
-                {/* Cleaners */}
+                {/* Staff / Cleaners */}
                 {selected.type !== "poa" && (
                   <div style={configCard}>
-                    <div style={configLabel}><Users size={14} /> Number of Cleaners</div>
+                    <div style={configLabel}><Users size={14} /> Number of {staffLabel}</div>
                     <Counter
                       value={cleaners ?? (selected as any).minCleaners ?? 1}
                       min={(selected as any).minCleaners ?? 1}
                       max={(selected as any).maxCleaners ?? 10}
                       onChange={setCleaners}
-                      label="Cleaners"
+                      label={staffLabel}
+                      suffix={`×${cleaners}`}
                     />
                     {(cleaners ?? 0) > 1 && (
                       <div style={{ fontSize: 12, color: "#059669", marginTop: 8, display: "flex", gap: 5, alignItems: "center" }}>
-                        <CheckCircle2 size={12} /> {cleaners} cleaners — job completed faster
+                        <CheckCircle2 size={12} /> {formatStaffCount(selected, cleaners)} — job completed faster
                       </div>
                     )}
                   </div>
@@ -613,6 +667,7 @@ export default function BookingModal({
                     seats={seats}
                     tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
+                    staffLabel={staffLabel}
                   />
                 </div>
               )}
@@ -717,7 +772,7 @@ export default function BookingModal({
                     {selected.type === "oven" && <ReviewRow label="Oven Type" value={ovenLabel} />}
                     {selected.type === "perRoom" && <ReviewRow label="Rooms" value={`${rooms} room${rooms > 1 ? "s" : ""}`} />}
                     {selected.type === "perSeat" && <ReviewRow label="Sofa Seats" value={`${seats} seat${seats > 1 ? "s" : ""}`} />}
-                    {selected.type !== "poa" && <ReviewRow label="Cleaners" value={`${cleaners} cleaner${cleaners > 1 ? "s" : ""}`} />}
+                    {selected.type !== "poa" && <ReviewRow label={staffLabel} value={formatStaffCount(selected, cleaners)} />}
                     {addons.length > 0 && <ReviewRow label="Add-ons" value={addons.map((id) => ADDONS.find((a) => a.id === id)?.label).join(", ")} />}
                   </div>
                 </div>
@@ -746,6 +801,7 @@ export default function BookingModal({
                     seats={seats}
                     tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
+                    staffLabel={staffLabel}
                   />
                 ) : (
                   <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", textAlign: "center" }}>
