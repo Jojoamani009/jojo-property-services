@@ -6,7 +6,7 @@ import {
   ShieldCheck, BadgeCheck, Clock, PoundSterling,
   Phone, Mail, MapPin, Star, CheckCircle2, Sparkles,
   Truck, Wrench, Home, Building2, Leaf, Flame, ChevronRight,
-  Brush, Armchair,
+  Brush, Armchair, Menu, X, MessageCircle,
 } from "lucide-react";
 
 const EMAILJS_SERVICE  = "service_vgitf2j";
@@ -16,8 +16,14 @@ const EMAILJS_KEY      = "Zd2QJQZ7GXWqDTblv";
 const BRAND = {
   name: "Jojo Property Services Ltd",
   phone: "07305851573",
+  whatsapp: "07341958822",
   email: "info@jojopropertyservices.co.uk",
 };
+
+// wa.me requires international format with no leading 0 — convert 07... to 447...
+const whatsappHref = `https://wa.me/44${BRAND.whatsapp.replace(/^0/, "")}`;
+
+const NAV_LINKS = ["Services", "Pricing", "Areas", "Reviews", "Contact"];
 
 const services = [
   { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                 from: "POA"       },
@@ -66,6 +72,7 @@ export default function HomePage() {
   const [sending, setSending] = useState(false);
   const [calcHours, setCalcHours] = useState(2);
   const [calcCleaners, setCalcCleaners] = useState(1);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -152,30 +159,86 @@ export default function HomePage() {
           input, textarea, select { width: 100%; border: 1.5px solid #dce3f0; border-radius: 8px; padding: 13px 16px; font-size: 15px; font-family: inherit; color: #1a1a2e; background: #fff; outline: none; transition: border-color 0.2s; }
           input:focus, textarea:focus, select:focus { border-color: #1a6bff; }
           textarea { resize: vertical; min-height: 120px; }
+
+          /* ---- Responsive nav ---- */
+          .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 80px; gap: 16px; }
+          .nav-brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+          .nav-brand img { height: 56px; width: 56px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+          .nav-brand-name { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; color: #0d1b3e; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+          .nav-links { display: flex; gap: 28px; align-items: center; }
+          .nav-links a { font-size: 14px; font-weight: 500; color: #3d4a6b; text-decoration: none; white-space: nowrap; }
+          .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+          .nav-icon-btn { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 8px; text-decoration: none; flex-shrink: 0; }
+          .nav-hamburger { display: none; background: none; border: none; cursor: pointer; padding: 8px; color: #0d1b3e; flex-shrink: 0; }
+          .nav-mobile-panel { display: none; flex-direction: column; background: #fff; border-top: 1px solid #eef0f7; box-shadow: 0 8px 24px rgba(13,27,62,0.08); }
+          .nav-mobile-panel.open { display: flex; }
+          .nav-mobile-panel a { padding: 14px 24px; font-size: 15px; font-weight: 500; color: #3d4a6b; text-decoration: none; border-bottom: 1px solid #f5f7fb; }
+          .nav-mobile-panel a.mobile-book-online { color: #1a6bff; font-weight: 700; }
+
+          @media (max-width: 860px) {
+            .nav-inner { height: 68px; }
+            .nav-brand img { height: 44px; width: 44px; }
+            .nav-brand-name { font-size: 15px; max-width: 46vw; }
+            .nav-links { display: none; }
+            .nav-hamburger { display: flex; }
+            .nav-call-text { display: none; }
+          }
         `}</style>
 
         {/* NAV */}
         <nav style={{ position: "sticky", top: 0, zIndex: 100, background: "#fff", borderBottom: "1px solid #eef0f7", boxShadow: "0 1px 8px rgba(0,0,0,0.04)" }}>
-          <div className="container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 80 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-              <img src="/logo.jpg" alt="Jojo Property Services Ltd" style={{ height: 70, width: 70, borderRadius: 10, objectFit: "cover" }} />
-              <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 22, color: "#0d1b3e", lineHeight: 1.2 }}>
-                Jojo Property Services Ltd
-              </span>
+          <div className="container nav-inner">
+            <div className="nav-brand">
+              <img src="/logo.jpg" alt="Jojo Property Services Ltd" />
+              <span className="nav-brand-name">Jojo Property Services Ltd</span>
             </div>
-            <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-              {["Services", "Pricing", "Areas", "Reviews", "Contact"].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} style={{ fontSize: 14, fontWeight: 500, color: "#3d4a6b", textDecoration: "none" }}>
-                  {item}
-                </a>
+
+            <div className="nav-links">
+              {NAV_LINKS.map((item) => (
+                <a key={item} href={`#${item.toLowerCase()}`}>{item}</a>
               ))}
               <a href="/booking" style={{ fontSize: 14, fontWeight: 600, color: "#1a6bff", textDecoration: "none" }}>
                 Book Online
               </a>
             </div>
-            <a href={`tel:${BRAND.phone}`} className="btn-primary" style={{ padding: "10px 20px", fontSize: 14, textDecoration: "none" }}>
-              <Phone size={14} style={{ display: "inline", marginRight: 6, verticalAlign: "-2px" }} />
-              {BRAND.phone}
+
+            <div className="nav-actions">
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-icon-btn"
+                aria-label="Message us on WhatsApp"
+                style={{ background: "#25D366" }}
+              >
+                <MessageCircle size={18} color="#fff" />
+              </a>
+              <a href={`tel:${BRAND.phone}`} className="btn-primary" style={{ padding: "10px 16px", fontSize: 14, textDecoration: "none", display: "flex", alignItems: "center" }}>
+                <Phone size={14} style={{ marginRight: 6 }} />
+                <span className="nav-call-text">{BRAND.phone}</span>
+              </a>
+              <button
+                className="nav-hamburger"
+                onClick={() => setMobileMenuOpen((o) => !o)}
+                aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={mobileMenuOpen}
+              >
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
+          </div>
+
+          <div className={`nav-mobile-panel${mobileMenuOpen ? " open" : ""}`}>
+            {NAV_LINKS.map((item) => (
+              <a key={item} href={`#${item.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)}>
+                {item}
+              </a>
+            ))}
+            <a href="/booking" className="mobile-book-online" onClick={() => setMobileMenuOpen(false)}>
+              Book Online
+            </a>
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer" onClick={() => setMobileMenuOpen(false)}>
+              WhatsApp Us
             </a>
           </div>
         </nav>
@@ -488,6 +551,9 @@ export default function HomePage() {
               <a href={`tel:${BRAND.phone}`} style={{ background: "transparent", color: "#fff", border: "2px solid rgba(255,255,255,0.5)", padding: "13px 28px", borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
                 <Phone size={16} /> {BRAND.phone}
               </a>
+              <a href={whatsappHref} target="_blank" rel="noopener noreferrer" style={{ background: "#25D366", color: "#fff", padding: "13px 28px", borderRadius: 8, fontWeight: 600, fontSize: 15, textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
+                <MessageCircle size={16} /> WhatsApp Us
+              </a>
             </div>
           </div>
         </section>
@@ -502,16 +568,28 @@ export default function HomePage() {
               <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 16 }}>
                 {([
                   { icon: Phone,  text: BRAND.phone },
+                  { icon: MessageCircle, text: `${BRAND.whatsapp} (WhatsApp)`, href: whatsappHref },
                   { icon: Mail,   text: BRAND.email },
                   { icon: MapPin, text: "Peterborough & surrounding areas" },
-                ] as { icon: React.ElementType; text: string }[]).map(({ icon: Icon, text }) => (
-                  <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ background: "#e8f0ff", width: 38, height: 38, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <Icon size={18} color="#1a6bff" />
+                ] as { icon: React.ElementType; text: string; href?: string }[]).map(({ icon: Icon, text, href }) => {
+                  const content = (
+                    <>
+                      <div style={{ background: "#e8f0ff", width: 38, height: 38, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Icon size={18} color="#1a6bff" />
+                      </div>
+                      <span style={{ fontSize: 15, color: "#3d4a6b" }}>{text}</span>
+                    </>
+                  );
+                  return href ? (
+                    <a key={text} href={href} target="_blank" rel="noopener noreferrer" style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+                      {content}
+                    </a>
+                  ) : (
+                    <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {content}
                     </div>
-                    <span style={{ fontSize: 15, color: "#3d4a6b" }}>{text}</span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             <div style={{ background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 20, padding: 36 }}>
