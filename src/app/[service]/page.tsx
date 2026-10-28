@@ -96,6 +96,31 @@ export default async function ServicePage({ params }: Props) {
             </>
           )}
 
+          {s.priceRows && (
+            <>
+              <h2 style={h2}>Prices</h2>
+              <div style={{ border: "1.5px solid #eef1f8", borderRadius: 16, overflow: "hidden", maxWidth: 520 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <thead>
+                    <tr style={{ background: "#1a6bff" }}>
+                      <th style={{ padding: "14px 18px", textAlign: "left", color: "#fff", fontSize: 14 }}>Service</th>
+                      <th style={{ padding: "14px 18px", textAlign: "right", color: "#fff", fontSize: 14 }}>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {s.priceRows.map((r, i) => (
+                      <tr key={r.label} style={{ borderBottom: "1px solid #eef1f8", background: i % 2 ? "#fafbff" : "#fff" }}>
+                        <td style={{ padding: "13px 18px", fontSize: 14, color: "#3d4a6b" }}>{r.label}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 14, fontWeight: 600, color: "#0d1b3e", textAlign: "right" }}>{r.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p style={{ fontSize: 13, color: "#8a96b0", marginTop: 8 }}>We confirm the final price before work starts, with no hidden fees.</p>
+            </>
+          )}
+
           {hm && (
             <>
               <h2 style={h2}>Prices</h2>
@@ -135,7 +160,7 @@ export default async function ServicePage({ params }: Props) {
                       </tr>
                     </thead>
                     <tbody>
-                      {[3, 4, 6, 8].filter((h) => h >= hm.minHours).map((h, i) => (
+                      {[2, 3, 4, 6, 8].filter((h) => h >= hm.minHours).map((h, i) => (
                         <tr key={h} style={{ borderBottom: "1px solid #eef1f8", background: i % 2 ? "#fafbff" : "#fff" }}>
                           <td style={{ padding: "13px 18px", fontSize: 14, color: "#3d4a6b" }}>{h} hours</td>
                           {cols.map((c) => (
@@ -148,6 +173,24 @@ export default async function ServicePage({ params }: Props) {
                 </div>
               )}
               <p style={{ fontSize: 13, color: "#8a96b0", marginTop: 8 }}>Minimum booking {hm.minHours} hours. {hm.presets ? "Typical times are a guide, and heavily soiled properties may need longer. " : ""}Use the calculator for any other combination. We confirm the final price before work starts, with no hidden fees.</p>
+            </>
+          )}
+
+          {s.extras && (
+            <>
+              <h2 style={h2}>Add-ons and extras</h2>
+              <div style={{ border: "1.5px solid #eef1f8", borderRadius: 16, overflow: "hidden", maxWidth: 520 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                  <tbody>
+                    {s.extras.map((r, i) => (
+                      <tr key={r.label} style={{ borderBottom: "1px solid #eef1f8", background: i % 2 ? "#fafbff" : "#fff" }}>
+                        <td style={{ padding: "13px 18px", fontSize: 14, color: "#3d4a6b" }}>{r.label}</td>
+                        <td style={{ padding: "13px 18px", fontSize: 14, fontWeight: 600, color: "#0d1b3e", textAlign: "right" }}>{r.price}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </>
           )}
 

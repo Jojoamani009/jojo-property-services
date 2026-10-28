@@ -31,18 +31,20 @@ const services: { icon: React.ElementType; label: string; desc: string; from: st
   { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                 from: "POA"       },
   { icon: Building2,    label: "End of Tenancy Clean",  desc: "Guaranteed deposit-back end of tenancy/one-off deep clean",                                                                       from: "£25/hr", slug: "end-of-tenancy-cleaning-peterborough" },
   { icon: CheckCircle2, label: "Domestic Clean",        desc: "Regular, flexible private property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean (Charges separately)", from: "£20/hr" },
+  { icon: Home,         label: "Airbnb & Serviced Accommodation Cleaning", desc: "Changeover cleaning between guests, with linen hire, laundry and restocking available",                                        from: "£20/hr", slug: "airbnb-changeover-cleaning-peterborough" },
   { icon: Sparkles,     label: "Commercial Clean",      desc: "Regular, flexible offices and retail property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean", from: "£25/hr"    },
   { icon: Truck,        label: "Man & Van",             desc: "Tip run, Pick-up & Drop off, Local moves & collections",                                                                         from: "POA"       },
   { icon: Home,         label: "House Clearance",       desc: "House, Garage, Shed & Garden clearance, and disposed responsibly",                                                               from: "POA"       },
   { icon: Home,         label: "Garden Maintenance",    desc: "Regular garden maintenance & fences installation/repair",                                                                        from: "POA"       },
   { icon: Wrench,       label: "Plumbing & Heating",    desc: "Qualified & reliable tradespeople for all plumbing works, such as bathroom tap/toilet/sink leaks & fixes",                      from: "POA"       },
   { icon: Brush,        label: "Painting & Decoration", desc: "Qualified & reliable tradespeople for all kinds of painting & decoration work",                                                  from: "£200/room" },
-  { icon: Armchair,     label: "Sofa Deep Clean",       desc: "Professional upholstery & sofa cleaning",                                                                                        from: "£30/seat"  },
+  { icon: Armchair,     label: "Sofa Deep Clean",       desc: "Professional upholstery & sofa cleaning",                                                                                        from: "£30/seat", slug: "carpet-and-sofa-cleaning-peterborough" },
 ];
 
 // Hourly calculator settings (same limits as the booking screen)
 const CALC_LIMITS: Record<string, { rate: number; minHours: number; maxHours: number; maxCleaners: number }> = {
   domestic:   { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
+  airbnb:     { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
   commercial: { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 10 },
   tenancy:    { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 3  },
 };
@@ -326,6 +328,7 @@ export default function HomePage() {
                   style={{ width: "100%", border: "1.5px solid #dce3f0", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontFamily: "inherit", color: "#1a1a2e", background: "#fff", outline: "none" }}>
                   <option value="">Select a Service</option>
                   <option value="domestic">Domestic Cleaning — £20/hr per cleaner</option>
+                  <option value="airbnb">Airbnb / Serviced Accommodation — £20/hr per cleaner</option>
                   <option value="commercial">Commercial Cleaning — £25/hr per cleaner</option>
                   <option value="tenancy">End of Tenancy / Deep Clean — £25/hr per cleaner</option>
                   <option value="carpet">Carpet & Upholstery — £70/room</option>
@@ -438,8 +441,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* SERVICES */}
-                {/* INTRO */}
+        {/* INTRO */}
         <section className="section" style={{ paddingBottom: 0 }}>
           <div className="container" style={{ maxWidth: 860, textAlign: "center" }}>
             <h2 className="section-title">Your Local Cleaning & Property Service in Peterborough</h2>
@@ -454,7 +456,8 @@ export default function HomePage() {
             </p>
           </div>
         </section>
-        
+
+        {/* SERVICES */}
         <section className="section" id="services">
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: 48 }}>

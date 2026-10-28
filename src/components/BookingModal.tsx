@@ -41,6 +41,21 @@ const SERVICES = [
     bg: "#e0f2fe",
   },
   {
+    id: "airbnb",
+    icon: Home,
+    label: "Airbnb / Serviced Accommodation",
+    desc: "Changeover cleaning between guests",
+    type: "hourly",
+    ratePerCleaner: 20,
+    minHours: 2,
+    maxHours: 8,
+    minCleaners: 1,
+    maxCleaners: 4,
+    staffLabel: "Cleaners",
+    color: "#e11d48",
+    bg: "#ffe4e6",
+  },
+  {
     id: "tenancy",
     icon: CheckCircle2,
     label: "End of Tenancy / Deep Clean",
@@ -163,13 +178,16 @@ const SERVICES = [
   },
 ];
 
+// Which add-ons show for which service. Linen & laundry is for Airbnb only;
+// weekend / same-day / key collection suit the cleaning services (not quote-only trades).
+const CLEANING_IDS = ["domestic", "commercial", "tenancy", "airbnb", "carpet", "oven", "sofa"];
 const ADDONS = [
-  { id: "linen2", label: "Linen hire & laundry for (2bedroom)", price: 50 },
-  { id: "linen3", label: "Linen hire & laundry for (3bedroom)", price: 75 },
-  { id: "linen4", label: "Linen hire & laundry for (4bedroom)", price: 100 },
-  { id: "weekend", label: "Weekend / Bank Holiday Rate", price: 15 },
-  { id: "express", label: "Same-Day / Express Booking", price: 25 },
-  { id: "keys", label: "Key Collection & Return", price: 20 },
+  { id: "linen2", label: "Linen hire & laundry (2 bedrooms)", price: 50, appliesTo: ["airbnb"] },
+  { id: "linen3", label: "Linen hire & laundry (3 bedrooms)", price: 75, appliesTo: ["airbnb"] },
+  { id: "linen4", label: "Linen hire & laundry (4 bedrooms)", price: 100, appliesTo: ["airbnb"] },
+  { id: "weekend", label: "Weekend / Bank Holiday Rate", price: 15, appliesTo: CLEANING_IDS },
+  { id: "express", label: "Same-Day / Express Booking", price: 25, appliesTo: CLEANING_IDS },
+  { id: "keys", label: "Key Collection & Return", price: 20, appliesTo: CLEANING_IDS },
 ];
 
 // Typical hours and cleaners for End of Tenancy / Deep Clean, by property size
@@ -330,6 +348,7 @@ export default function BookingModal({
   const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, ovenType, seats) : null;
   const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
   const staffLabel = getStaffLabel(selected);
+  const availableAddons = selected ? ADDONS.filter((a) => a.appliesTo.includes(selected.id)) : [];
 
   useEffect(() => {
     if (!selected) return;
@@ -639,10 +658,11 @@ export default function BookingModal({
                 )}
 
                 {/* Add-ons */}
+                {availableAddons.length > 0 && (
                 <div style={configCard}>
                   <div style={configLabel}><Star size={14} /> Add-ons (optional)</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
-                    {ADDONS.map((a) => (
+                    {availableAddons.map((a) => (
                       <label key={a.id} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                         <input type="checkbox" checked={addons.includes(a.id)} onChange={() => toggleAddon(a.id)}
                           style={{ width: 16, height: 16, accentColor: "#1a6bff" }} />
@@ -652,6 +672,7 @@ export default function BookingModal({
                     ))}
                   </div>
                 </div>
+                )}
               </div>
 
               {/* Live price */}
