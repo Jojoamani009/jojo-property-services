@@ -3,9 +3,10 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jojo Property Services Ltd | Cleaning & Property Services Peterborough",
-  description: "Fully insured, DBS-checked cleaning and property services in Peterborough. End of tenancy, domestic, commercial, carpet, oven cleaning, plumbing, painting & more. Call 07305851573.",
-  keywords: "cleaning services Peterborough, end of tenancy cleaning Peterborough, domestic cleaning Peterborough, commercial cleaning Peterborough, carpet cleaning Peterborough, oven cleaning Property, property maintenance Peterborough, house clearance Peterborough, painting & decoration Peterborough, furniture assembly & disassembly, fence panel installation, garden maintenance ",
+  // Lets relative URLs like canonical: "/" resolve to the full address
+  metadataBase: new URL("https://jojopropertyservices.co.uk"),
+  title: "Cleaning & Property Services Peterborough | Jojo",
+  description: "Fully insured, DBS-checked cleaning and property services in Peterborough. End of tenancy, domestic, commercial, carpet & oven cleaning. Call 07305851573.",
   openGraph: {
     title: "Jojo Property Services Ltd | Peterborough",
     description: "Professional cleaning & property services in Peterborough. Fully insured, DBS-checked. Book online or call 07305851573.",
@@ -36,9 +37,9 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
-  alternates: {
-    canonical: "https://jojopropertyservices.co.uk",
-  },
+  // NOTE: no site-wide canonical here. A canonical in the root layout is inherited by
+  // every page (/about, /booking, ...) and tells Google they are all copies of the
+  // homepage. The homepage canonical is set in src/app/page.tsx instead.
 };
 
 export default function RootLayout({
@@ -47,7 +48,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en-GB">
       <body>{children}</body>
     </html>
   );

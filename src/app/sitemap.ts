@@ -1,6 +1,15 @@
 import { MetadataRoute } from "next";
+import { publishedServices } from "../lib/services";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  // Service pages appear here automatically once published: true in lib/services.ts
+  const servicePages: MetadataRoute.Sitemap = publishedServices().map((s) => ({
+    url: `https://jojopropertyservices.co.uk/${s.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: 0.9,
+  }));
+
   return [
     {
       url: "https://jojopropertyservices.co.uk",
@@ -8,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    ...servicePages,
     {
       url: "https://jojopropertyservices.co.uk/booking",
       lastModified: new Date(),

@@ -43,10 +43,12 @@ const SERVICES = [
   {
     id: "tenancy",
     icon: CheckCircle2,
-    label: "End of Tenancy",
-    desc: "Guaranteed deposit-back clean",
-    type: "tenancy",
-    prices: { studio: 140, two: 160, three: 210, four: 280 },
+    label: "End of Tenancy / Deep Clean",
+    desc: "Move-in/out & one-off deep clean",
+    type: "hourly",
+    ratePerCleaner: 25,
+    minHours: 3,
+    maxHours: 12,
     minCleaners: 1,
     maxCleaners: 3,
     staffLabel: "Cleaners",
@@ -170,11 +172,12 @@ const ADDONS = [
   { id: "keys", label: "Key Collection & Return", price: 20 },
 ];
 
-const TENANCY_SIZES = [
-  { key: "studio", label: "Studio / 1 Bedroom", price: 140 },
-  { key: "two",    label: "2 Bedrooms",          price: 160 },
-  { key: "three",  label: "3 Bedrooms",          price: 210 },
-  { key: "four",   label: "4-5 Bedrooms",        price: 280 },
+// Typical hours and cleaners for End of Tenancy / Deep Clean, by property size
+const TENANCY_GUIDE = [
+  { label: "Studio / 1 bedroom", hours: 6, cleaners: 1 },
+  { label: "2 bedrooms",         hours: 8, cleaners: 1 },
+  { label: "3 bedrooms",         hours: 7, cleaners: 2 },
+  { label: "4-5 bedrooms",       hours: 8, cleaners: 2 },
 ];
 
 const OVEN_TYPES = [
@@ -203,15 +206,10 @@ function formatStaffCount(svc: Service | null, count: number): string {
   return `${count} ${label.toLowerCase()}`;
 }
 
-function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], tenancySize: string, ovenType: string, seats: number) {
+function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], ovenType: string, seats: number) {
   let base = 0;
   if (svc.type === "hourly") {
     base = (svc as any).ratePerCleaner * cleaners * hours;
-  } else if (svc.type === "fixed") {
-    base = (svc as any).basePrice + ((svc as any).extraPerCleaner ?? 0) * (cleaners - 1);
-  } else if (svc.type === "tenancy") {
-    const prices: Record<string, number> = { studio: 140, two: 160, three: 210, four: 280 };
-    base = prices[tenancySize] ?? 140;
   } else if (svc.type === "oven") {
     base = ovenType === "double" ? 75 : 70;
   } else if (svc.type === "perRoom") {
@@ -272,7 +270,7 @@ function Counter({ value, min, max, onChange, label, suffix }: {
   );
 }
 
-function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, tenancyLabel, ovenLabel, staffLabel }: any) {
+function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, ovenLabel, staffLabel }: any) {
   const staffWord = (staffLabel ?? "Cleaners").toLowerCase();
   return (
     <div style={{ background: "linear-gradient(135deg,#1a6bff,#0f4ac4)", borderRadius: 16, padding: "20px 24px", color: "#fff", marginTop: 8 }}>
@@ -283,7 +281,6 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
           <div style={{ fontSize: 12, opacity: 0.7, marginTop: 6 }}>
             {type === "hourly" && `£${rate}/hr × ${cleaners} ${staffWord} × ${hours} hr${hours > 1 ? "s" : ""}`}
             {type === "fixed" && "Fixed price service"}
-            {type === "tenancy" && `End of Tenancy — ${tenancyLabel}`}
             {type === "oven" && `Oven Cleaning — ${ovenLabel}`}
             {type === "perRoom" && `£${rate}/room × ${rooms} room${rooms > 1 ? "s" : ""}`}
             {type === "perSeat" && `£${rate}/seat × ${seats} seat${seats > 1 ? "s" : ""}`}
@@ -323,7 +320,6 @@ export default function BookingModal({
   const [rooms, setRooms] = useState(2);
   const [seats, setSeats] = useState(2);
   const [addons, setAddons] = useState<string[]>([]);
-  const [tenancySize, setTenancySize] = useState("studio");
   const [ovenType, setOvenType] = useState("standard");
   const [date, setDate] = useState(getDates()[1].value);
   const [time, setTime] = useState("09:00");
@@ -331,26 +327,26 @@ export default function BookingModal({
   const [submitted, setSubmitted] = useState(false);
 
   const dates = getDates();
-  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, tenancySize, ovenType, seats) : null;
-  const tenancyLabel = TENANCY_SIZES.find(s => s.key === tenancySize)?.label ?? "";
+  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, ovenType, seats) : null;
   const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
   const staffLabel = getStaffLabel(selected);
 
   useEffect(() => {
     if (!selected) return;
-    setHours((selected as any).minHours ?? 1);
-    setCleaners((selected as any).minCleaners ?? 1);
+    // End of Tenancy starts on the typical 1-bedroom setting
+    const guide = selected.id === "tenancy" ? TENANCY_GUIDE[0] : null;
+    setHours(guide ? guide.hours : (selected as any).minHours ?? 1);
+    setCleaners(guide ? guide.cleaners : (selected as any).minCleaners ?? 1);
     setRooms(1);
     setSeats(1);
     setAddons([]);
-    setTenancySize("studio");
     setOvenType("standard");
   }, [selected]);
 
   const toggleAddon = (id: string) =>
     setAddons((prev) => prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]);
 
-  const STEPS = ["Service", "Configure", "Date & Time", "Your Details", "Confirm"];
+  const STEPS = ["Service", "Configure", "Date & Time", "Your Details", "Review"];
 
   const canNext = () => {
     if (step === 1) return !!selected;
@@ -377,9 +373,7 @@ export default function BookingModal({
         }),
         time: time,
         details:
-          selected?.type === "tenancy"
-            ? tenancyLabel
-            : selected?.type === "oven"
+          selected?.type === "oven"
             ? ovenLabel
             : selected?.type === "hourly"
             ? `${hours} hour${hours > 1 ? "s" : ""}`
@@ -421,10 +415,10 @@ export default function BookingModal({
           <div style={{ width: 72, height: 72, background: "#d1fae5", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
             <CheckCircle2 size={36} color="#059669" />
           </div>
-          <h2 style={heading}>Booking Confirmed!</h2>
+          <h2 style={heading}>Booking Request Received!</h2>
           <p style={{ color: "#5a6782", marginTop: 12, lineHeight: 1.65, fontSize: 15 }}>
-            Thanks, <strong>{details.name}</strong>! Your {selected?.label} booking is confirmed for{" "}
-            <strong>{new Date(date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</strong> at <strong>{time}</strong>.
+            Thanks, <strong>{details.name}</strong>! We’ve received your {selected?.label} request for{" "}
+            <strong>{new Date(date).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</strong> at <strong>{time}</strong>. We’ll confirm availability shortly.
           </p>
           <div style={{ background: "#f5f8ff", borderRadius: 12, padding: "16px 20px", marginTop: 24, textAlign: "left" }}>
             {[
@@ -441,7 +435,7 @@ export default function BookingModal({
               </div>
             ))}
           </div>
-          <p style={{ fontSize: 13, color: "#8a96b0", marginTop: 16 }}>A confirmation will be sent to <strong>{details.email || details.phone}</strong>.</p>
+          <p style={{ fontSize: 13, color: "#8a96b0", marginTop: 16 }}>We’ll confirm by phone or email using <strong>{details.email || details.phone}</strong>.</p>
           <button onClick={onClose} style={{ ...primaryBtn, marginTop: 28, width: "100%" }}>Done</button>
         </div>
       </div>
@@ -503,9 +497,9 @@ export default function BookingModal({
                         <div style={{ fontSize: 12, fontWeight: 700, color: svc.color, marginTop: 4 }}>
                           {svc.type === "hourly" && `£${(svc as any).ratePerCleaner}/hr per ${getStaffLabelSingular(svc).toLowerCase()}`}
                           {svc.type === "fixed" && `From £${(svc as any).basePrice}`}
-                          {svc.type === "tenancy" && "From £140"}
                           {svc.type === "oven" && "From £70"}
                           {svc.type === "perRoom" && `£${(svc as any).ratePerRoom}/room`}
+                          {svc.type === "perSeat" && `£${(svc as any).ratePerSeat}/seat`}
                           {svc.type === "poa" && "Price on Application"}
                         </div>
                       </div>
@@ -531,18 +525,26 @@ export default function BookingModal({
 
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
 
-                {/* Tenancy bedroom selector */}
-                {selected.type === "tenancy" && (
+                {/* Tenancy: typical times by property size */}
+                {selected.id === "tenancy" && (
                   <div style={configCard}>
-                    <div style={configLabel}>🏠 Property Size</div>
+                    <div style={configLabel}>🏠 Not sure how long? Typical times</div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
-                      {TENANCY_SIZES.map(({ key, label, price: p }) => (
-                        <button key={key} onClick={() => setTenancySize(key)}
-                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: `2px solid ${tenancySize === key ? "#7c3aed" : "#eef1f8"}`, borderRadius: 10, background: tenancySize === key ? "#ede9fe" : "#fff", cursor: "pointer", fontFamily: "inherit" }}>
-                          <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{label}</span>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "#7c3aed" }}>£{p}</span>
-                        </button>
-                      ))}
+                      {TENANCY_GUIDE.map((g) => {
+                        const on = hours === g.hours && cleaners === g.cleaners;
+                        return (
+                          <button key={g.label} onClick={() => { setHours(g.hours); setCleaners(g.cleaners); }}
+                            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "12px 16px", border: `2px solid ${on ? "#7c3aed" : "#eef1f8"}`, borderRadius: 10, background: on ? "#ede9fe" : "#fff", cursor: "pointer", fontFamily: "inherit", textAlign: "left" }}>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{g.label}</span>
+                            <span style={{ fontSize: 13, color: "#5a6782", textAlign: "right" }}>
+                              {g.hours} hrs · {g.cleaners} cleaner{g.cleaners > 1 ? "s" : ""} · £{g.hours * g.cleaners * 25}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#8a96b0" }}>
+                      Typical times are a guide. You can adjust the hours and cleaners below.
                     </div>
                   </div>
                 )}
@@ -665,7 +667,6 @@ export default function BookingModal({
                     hours={hours}
                     rooms={rooms}
                     seats={seats}
-                    tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
                     staffLabel={staffLabel}
                   />
@@ -768,7 +769,6 @@ export default function BookingModal({
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {selected.type === "hourly" && <ReviewRow label="Duration" value={`${hours} hour${hours > 1 ? "s" : ""}`} />}
-                    {selected.type === "tenancy" && <ReviewRow label="Property Size" value={tenancyLabel} />}
                     {selected.type === "oven" && <ReviewRow label="Oven Type" value={ovenLabel} />}
                     {selected.type === "perRoom" && <ReviewRow label="Rooms" value={`${rooms} room${rooms > 1 ? "s" : ""}`} />}
                     {selected.type === "perSeat" && <ReviewRow label="Sofa Seats" value={`${seats} seat${seats > 1 ? "s" : ""}`} />}
@@ -799,7 +799,6 @@ export default function BookingModal({
                     hours={hours}
                     rooms={rooms}
                     seats={seats}
-                    tenancyLabel={tenancyLabel}
                     ovenLabel={ovenLabel}
                     staffLabel={staffLabel}
                   />
@@ -843,7 +842,7 @@ export default function BookingModal({
             </button>
           ) : (
             <button onClick={handleSubmit} style={{ ...primaryBtn, background: "#059669", display: "flex", alignItems: "center", gap: 6 }}>
-              <CheckCircle2 size={16} /> Confirm Booking
+              <CheckCircle2 size={16} /> Send Booking Request
             </button>
           )}
         </div>

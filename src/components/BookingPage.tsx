@@ -11,7 +11,7 @@ import {
 const CARDS = [
   { id: "domestic",    icon: Home,         label: "Domestic Clean",     badge: "Most Popular", rate: "£20/hr ", color: "#1a6bff", bg: "#e8f0ff" },
   { id: "commercial",  icon: Building2,    label: "Commercial Clean",   badge: null,           rate: "£25/hr ", color: "#0891b2", bg: "#e0f2fe" },
-  { id: "tenancy",     icon: CheckCircle2, label: "End of Tenancy Clean",        badge: "Fixed Price (1-bed house/flat",  rate: "From £140",          color: "#7c3aed", bg: "#ede9fe" },
+  { id: "tenancy",     icon: CheckCircle2, label: "End of Tenancy / Deep Clean", badge: "Move-in/out too", rate: "£25/hr per cleaner", color: "#7c3aed", bg: "#ede9fe", href: "/end-of-tenancy-cleaning-peterborough" },
   { id: "carpet",      icon: Sparkles,     label: "Carpet & Upholstery Clean",   badge: null,           rate: "£70/room",           color: "#059669", bg: "#d1fae5" },
   { id: "oven",        icon: Flame,        label: "Oven Clean",         badge: "Fixed Price",  rate: "From £70",           color: "#dc2626", bg: "#fee2e2" },
   { id: "manvan",      icon: Truck,        label: "Man & Van",             badge: null,           rate: "POA",                color: "#d97706", bg: "#fef3c7" },
@@ -70,7 +70,7 @@ export default function BookingPage() {
           Choose your service, pick your date & time, and get an instant price — no phone calls needed.
         </p>
         <div style={{ display: "flex", justifyContent: "center", gap: 20, marginTop: 28, flexWrap: "wrap" }}>
-          {["Instant Price Calculator", "Live Availability", "No Deposit Required"].map((t) => (
+          {["Instant Price Calculator", "Flexible Scheduling", "No Deposit Required"].map((t) => (
             <div key={t} style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 14, color: "rgba(255,255,255,0.75)" }}>
               <CheckCircle2 size={14} color="#4ade80" /> {t}
             </div>
@@ -84,7 +84,7 @@ export default function BookingPage() {
           Our Services
         </h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
-          {CARDS.map(({ id, icon: Icon, label, badge, rate, color, bg }) => (
+          {CARDS.map(({ id, icon: Icon, label, badge, rate, color, bg, href }) => (
             <div key={label} className="card"
               style={{ background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 16, padding: "24px 22px", display: "flex", flexDirection: "column", gap: 0, transition: "box-shadow 0.2s, border-color 0.2s" }}
               onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.boxShadow = `0 4px 24px ${color}22`; }}
@@ -121,6 +121,12 @@ export default function BookingPage() {
                   <ArrowRight size={15} />
                 </span>
               </button>
+
+              {href && (
+                <Link href={href} style={{ marginTop: 12, textAlign: "center", fontSize: 13, fontWeight: 600, color, textDecoration: "none" }}>
+                  View prices & typical times →
+                </Link>
+              )}
             </div>
           ))}
         </div>
