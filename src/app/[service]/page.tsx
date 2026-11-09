@@ -5,6 +5,8 @@ import { CALC, getService, publishedServices } from "../../lib/services";
 import SiteShell from "../../components/SiteChrome";
 import ServiceMenu from "../../components/ServiceMenu";
 import QuotePanel from "../../components/QuotePanel";
+import BeforeAfterGallery from "../../components/BeforeAfterGallery";
+import { GALLERY } from "../../lib/gallery";
 
 type Props = { params: Promise<{ service: string }> };
 
@@ -36,6 +38,8 @@ export default async function ServicePage({ params }: Props) {
 
   const hm = s.hourlyTable && CALC[s.calcId]?.model.kind === "hourly" ? (CALC[s.calcId].model as any) : null;
   const cols = hm ? Array.from({ length: Math.min(3, hm.maxStaff) }, (_, i) => i + 1) : [];
+
+  const photos = GALLERY.filter((g) => g.service === s.slug);
 
   const faqSchema = s.faqs && {
     "@context": "https://schema.org",
@@ -191,6 +195,14 @@ export default async function ServicePage({ params }: Props) {
                   </tbody>
                 </table>
               </div>
+            </>
+          )}
+
+          {photos.length > 0 && (
+            <>
+              <h2 style={h2}>Our work</h2>
+              <p style={{ color: "#5a6782", marginBottom: 16 }}>Drag the slider to compare before and after.</p>
+              <BeforeAfterGallery items={photos} />
             </>
           )}
 

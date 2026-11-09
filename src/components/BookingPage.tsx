@@ -31,7 +31,7 @@ const services: { icon: React.ElementType; label: string; desc: string; from: st
   { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                 from: "POA"       },
   { icon: Building2,    label: "End of Tenancy Clean",  desc: "Guaranteed deposit-back end of tenancy/one-off deep clean",                                                                       from: "£25/hr", slug: "end-of-tenancy-cleaning-peterborough" },
   { icon: CheckCircle2, label: "Domestic Clean",        desc: "Regular, flexible private property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean (Charges separately)", from: "£20/hr" },
-  { icon: Home,         label: "Airbnb & Serviced Accommodation Cleaning", desc: "Changeover cleaning between guests, with linen hire, laundry and restocking available",                                        from: "£20/hr", slug: "airbnb-changeover-cleaning-peterborough" },
+  { icon: Home,         label: "Airbnb & Serviced Accommodation Cleaning", desc: "Changeover cleaning between guests, with linen hire, laundry and restocking available",                                        from: "£25/hr", slug: "airbnb-changeover-cleaning-peterborough" },
   { icon: Sparkles,     label: "Commercial Clean",      desc: "Regular, flexible offices and retail property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean", from: "£25/hr"    },
   { icon: Truck,        label: "Man & Van",             desc: "Tip run, Pick-up & Drop off, Local moves & collections",                                                                         from: "POA"       },
   { icon: Home,         label: "House Clearance",       desc: "House, Garage, Shed & Garden clearance, and disposed responsibly",                                                               from: "POA"       },
@@ -43,8 +43,8 @@ const services: { icon: React.ElementType; label: string; desc: string; from: st
 
 // Hourly calculator settings (same limits as the booking screen)
 const CALC_LIMITS: Record<string, { rate: number; minHours: number; maxHours: number; maxCleaners: number }> = {
-  domestic:   { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
-  airbnb:     { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
+  domestic:   { rate: 20, minHours: 3, maxHours: 12,  maxCleaners: 4  },
+  airbnb:     { rate: 25, minHours: 2, maxHours: 12,  maxCleaners: 4  },
   commercial: { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 10 },
   tenancy:    { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 3  },
 };

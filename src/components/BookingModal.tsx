@@ -46,7 +46,7 @@ const SERVICES = [
     label: "Airbnb / Serviced Accommodation",
     desc: "Changeover cleaning between guests",
     type: "hourly",
-    ratePerCleaner: 20,
+    ratePerCleaner: 25,
     minHours: 2,
     maxHours: 8,
     minCleaners: 1,
@@ -84,6 +84,18 @@ const SERVICES = [
     staffLabel: "Cleaners",
     color: "#059669",
     bg: "#d1fae5",
+  },
+  {
+    id: "mattress",
+    icon: Armchair,
+    label: "Mattress Deep Clean",
+    desc: "Single, double or king size",
+    type: "mattress",
+    minCleaners: 1,
+    maxCleaners: 2,
+    staffLabel: "Cleaners",
+    color: "#9333ea",
+    bg: "#f3e8ff",
   },
   {
     id: "oven",
@@ -180,7 +192,7 @@ const SERVICES = [
 
 // Which add-ons show for which service. Linen & laundry is for Airbnb only;
 // weekend / same-day / key collection suit the cleaning services (not quote-only trades).
-const CLEANING_IDS = ["domestic", "commercial", "tenancy", "airbnb", "carpet", "oven", "sofa"];
+const CLEANING_IDS = ["domestic", "commercial", "tenancy", "airbnb", "carpet", "mattress", "oven", "sofa"];
 const ADDONS = [
   { id: "linen2", label: "Linen hire & laundry (2 bedrooms)", price: 50, appliesTo: ["airbnb"] },
   { id: "linen3", label: "Linen hire & laundry (3 bedrooms)", price: 75, appliesTo: ["airbnb"] },
@@ -201,6 +213,12 @@ const TENANCY_GUIDE = [
 const OVEN_TYPES = [
   { key: "standard", label: "Standard Oven",     price: 70 },
   { key: "double",   label: "Double Range Oven", price: 75 },
+];
+
+const MATTRESS_SIZES = [
+  { key: "single", label: "Single mattress",    price: 50 },
+  { key: "double", label: "Double mattress",    price: 65 },
+  { key: "king",   label: "King size mattress", price: 75 },
 ];
 
 type Service = (typeof SERVICES)[number];
@@ -224,12 +242,14 @@ function formatStaffCount(svc: Service | null, count: number): string {
   return `${count} ${label.toLowerCase()}`;
 }
 
-function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], ovenType: string, seats: number) {
+function calcPrice(svc: Service, hours: number, cleaners: number, rooms: number, addons: string[], ovenType: string, seats: number, mattressSize: string) {
   let base = 0;
   if (svc.type === "hourly") {
     base = (svc as any).ratePerCleaner * cleaners * hours;
   } else if (svc.type === "oven") {
     base = ovenType === "double" ? 75 : 70;
+  } else if (svc.type === "mattress") {
+    base = MATTRESS_SIZES.find((m) => m.key === mattressSize)?.price ?? 50;
   } else if (svc.type === "perRoom") {
     base = (svc as any).ratePerRoom * rooms;
   } else if (svc.type === "perSeat") {
@@ -288,7 +308,7 @@ function Counter({ value, min, max, onChange, label, suffix }: {
   );
 }
 
-function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, ovenLabel, staffLabel }: any) {
+function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, rooms, seats, ovenLabel, mattressLabel, staffLabel }: any) {
   const staffWord = (staffLabel ?? "Cleaners").toLowerCase();
   return (
     <div style={{ background: "linear-gradient(135deg,#1a6bff,#0f4ac4)", borderRadius: 16, padding: "20px 24px", color: "#fff", marginTop: 8 }}>
@@ -300,6 +320,7 @@ function PriceSummary({ base, addonsTotal, total, type, rate, cleaners, hours, r
             {type === "hourly" && `£${rate}/hr × ${cleaners} ${staffWord} × ${hours} hr${hours > 1 ? "s" : ""}`}
             {type === "fixed" && "Fixed price service"}
             {type === "oven" && `Oven Cleaning — ${ovenLabel}`}
+            {type === "mattress" && `Mattress deep clean — ${mattressLabel}`}
             {type === "perRoom" && `£${rate}/room × ${rooms} room${rooms > 1 ? "s" : ""}`}
             {type === "perSeat" && `£${rate}/seat × ${seats} seat${seats > 1 ? "s" : ""}`}
             {type === "poa" && "Price on application"}
@@ -339,14 +360,16 @@ export default function BookingModal({
   const [seats, setSeats] = useState(2);
   const [addons, setAddons] = useState<string[]>([]);
   const [ovenType, setOvenType] = useState("standard");
+  const [mattressSize, setMattressSize] = useState("single");
   const [date, setDate] = useState(getDates()[1].value);
   const [time, setTime] = useState("09:00");
   const [details, setDetails] = useState({ name: "", email: "", phone: "", address: "", notes: "" });
   const [submitted, setSubmitted] = useState(false);
 
   const dates = getDates();
-  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, ovenType, seats) : null;
+  const price = selected ? calcPrice(selected, hours, cleaners, rooms, addons, ovenType, seats, mattressSize) : null;
   const ovenLabel = OVEN_TYPES.find(o => o.key === ovenType)?.label ?? "";
+  const mattressLabel = MATTRESS_SIZES.find((m) => m.key === mattressSize)?.label ?? "";
   const staffLabel = getStaffLabel(selected);
   const availableAddons = selected ? ADDONS.filter((a) => a.appliesTo.includes(selected.id)) : [];
 
@@ -360,6 +383,7 @@ export default function BookingModal({
     setSeats(1);
     setAddons([]);
     setOvenType("standard");
+    setMattressSize("single");
   }, [selected]);
 
   const toggleAddon = (id: string) =>
@@ -394,6 +418,8 @@ export default function BookingModal({
         details:
           selected?.type === "oven"
             ? ovenLabel
+            : selected?.type === "mattress"
+            ? mattressLabel
             : selected?.type === "hourly"
             ? `${hours} hour${hours > 1 ? "s" : ""}`
             : selected?.type === "perRoom"
@@ -517,6 +543,7 @@ export default function BookingModal({
                           {svc.type === "hourly" && `£${(svc as any).ratePerCleaner}/hr per ${getStaffLabelSingular(svc).toLowerCase()}`}
                           {svc.type === "fixed" && `From £${(svc as any).basePrice}`}
                           {svc.type === "oven" && "From £70"}
+                          {svc.type === "mattress" && "From £50"}
                           {svc.type === "perRoom" && `£${(svc as any).ratePerRoom}/room`}
                           {svc.type === "perSeat" && `£${(svc as any).ratePerSeat}/seat`}
                           {svc.type === "poa" && "Price on Application"}
@@ -578,6 +605,22 @@ export default function BookingModal({
                           style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: `2px solid ${ovenType === key ? "#dc2626" : "#eef1f8"}`, borderRadius: 10, background: ovenType === key ? "#fee2e2" : "#fff", cursor: "pointer", fontFamily: "inherit" }}>
                           <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{label}</span>
                           <span style={{ fontSize: 14, fontWeight: 700, color: "#dc2626" }}>£{p}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Mattress size selector */}
+                {selected.type === "mattress" && (
+                  <div style={configCard}>
+                    <div style={configLabel}>🛏️ Mattress Size</div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                      {MATTRESS_SIZES.map(({ key, label, price: p }) => (
+                        <button key={key} onClick={() => setMattressSize(key)}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", border: `2px solid ${mattressSize === key ? "#9333ea" : "#eef1f8"}`, borderRadius: 10, background: mattressSize === key ? "#f3e8ff" : "#fff", cursor: "pointer", fontFamily: "inherit" }}>
+                          <span style={{ fontSize: 14, fontWeight: 600, color: "#0d1b3e" }}>{label}</span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#9333ea" }}>£{p}</span>
                         </button>
                       ))}
                     </div>
@@ -689,6 +732,7 @@ export default function BookingModal({
                     rooms={rooms}
                     seats={seats}
                     ovenLabel={ovenLabel}
+                    mattressLabel={mattressLabel}
                     staffLabel={staffLabel}
                   />
                 </div>
@@ -791,6 +835,7 @@ export default function BookingModal({
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {selected.type === "hourly" && <ReviewRow label="Duration" value={`${hours} hour${hours > 1 ? "s" : ""}`} />}
                     {selected.type === "oven" && <ReviewRow label="Oven Type" value={ovenLabel} />}
+                    {selected.type === "mattress" && <ReviewRow label="Mattress Size" value={mattressLabel} />}
                     {selected.type === "perRoom" && <ReviewRow label="Rooms" value={`${rooms} room${rooms > 1 ? "s" : ""}`} />}
                     {selected.type === "perSeat" && <ReviewRow label="Sofa Seats" value={`${seats} seat${seats > 1 ? "s" : ""}`} />}
                     {selected.type !== "poa" && <ReviewRow label={staffLabel} value={formatStaffCount(selected, cleaners)} />}
@@ -821,6 +866,7 @@ export default function BookingModal({
                     rooms={rooms}
                     seats={seats}
                     ovenLabel={ovenLabel}
+                    mattressLabel={mattressLabel}
                     staffLabel={staffLabel}
                   />
                 ) : (

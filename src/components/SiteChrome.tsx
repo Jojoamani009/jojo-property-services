@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { publishedServices } from "../lib/services";
-
+import { COMPANY, registeredOfficeAddress } from "../lib/company";
 const PHONE = "07305851573";
 const WHATSAPP = "https://wa.me/447341958822";
 const LINKS = ["Pricing", "Areas", "Reviews", "Contact"];
@@ -104,6 +104,9 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
           <p style={{ fontSize: 13, color: "#8a96b0" }}>Registered Company · Fully Insured · Waste Carrier Licensed</p>
           <p style={{ fontSize: 13, color: "#8a96b0" }}>© {new Date().getFullYear()} Jojo Property Services Ltd</p>
         </div>
+        <p style={{ maxWidth: 1160, margin: "24px auto 0", fontSize: 12, color: "#8a96b0", lineHeight: 1.7 }}>
+          {COMPANY.name} · Registered in {COMPANY.registeredIn}, company number {COMPANY.number} · Registered office: {registeredOfficeAddress} · Registered waste carrier: {COMPANY.wasteCarrier} · Serving {COMPANY.serviceArea}
+        </p>
       </footer>
     </div>
   );

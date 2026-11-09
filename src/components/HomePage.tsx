@@ -9,6 +9,9 @@ import {
   Brush, Armchair, Menu, X, MessageCircle,
 } from "lucide-react";
 import { getService, publishedServices } from "../lib/services";
+import { COMPANY, registeredOfficeAddress } from "../lib/company";
+import BeforeAfterGallery from "./BeforeAfterGallery";
+import { GALLERY } from "../lib/gallery";
 
 const EMAILJS_SERVICE  = "service_vgitf2j";
 const EMAILJS_TEMPLATE = "template_8m8vbss";
@@ -56,6 +59,8 @@ const TENANCY_GUIDE = [
   { label: "3 bedrooms",         hours: 7, cleaners: 2 },
   { label: "4-5 bedrooms",       hours: 8, cleaners: 2 },
 ];
+
+const featuredPhotos = GALLERY.filter((g) => g.featured);
 
 const areas = ["Peterborough", "Wisbech", "March", "Market Deeping", "Bourne", "Stamford", "Whittlesey"];
 
@@ -584,6 +589,20 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* OUR WORK: before and after photos (only shows when photos are added in lib/gallery.ts) */}
+        {featuredPhotos.length > 0 && (
+          <section className="section" id="our-work" style={{ background: "#f5f8ff" }}>
+            <div className="container">
+              <div style={{ textAlign: "center", marginBottom: 48 }}>
+                <div className="section-label">Our Work</div>
+                <h2 className="section-title">Before & After</h2>
+                <p className="section-sub">Real jobs from properties around Peterborough & surrounding areas...</p>
+              </div>
+              <BeforeAfterGallery items={featuredPhotos} />
+            </div>
+          </section>
+        )}
+
         {/* REVIEWS */}
         <section className="section" id="reviews">
           <div className="container">
@@ -713,6 +732,9 @@ export default function HomePage() {
               <p style={{ fontSize: 13, color: "#8a96b0" }}>Registered Company · Fully Insured · Waste Carrier Licensed</p>
               <p style={{ fontSize: 13, color: "#8a96b0" }}>© {new Date().getFullYear()} Jojo Property Services Ltd</p>
             </div>
+            <p style={{ fontSize: 12, color: "#8a96b0", marginTop: 24, lineHeight: 1.7 }}>
+              {COMPANY.name} · Registered in {COMPANY.registeredIn}, company number {COMPANY.number} · Registered office: {registeredOfficeAddress} · Registered waste carrier: {COMPANY.wasteCarrier} · Serving {COMPANY.serviceArea}
+            </p>
             {publishedServices().length > 0 && (
               <div style={{ marginTop: 24, display: "flex", flexWrap: "wrap", gap: "8px 20px" }}>
                 {publishedServices().map((s) => (
