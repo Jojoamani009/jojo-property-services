@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { getService, publishedServices } from "../lib/services";
 import { COMPANY, registeredOfficeAddress } from "../lib/company";
+import ReviewCards from "./ReviewCards";
+import { REVIEWS } from "../lib/reviews";
 import BeforeAfterGallery from "./BeforeAfterGallery";
 import { GALLERY } from "../lib/gallery";
 
@@ -34,7 +36,7 @@ const services: { icon: React.ElementType; label: string; desc: string; from: st
   { icon: Home,         label: "Property Maintenance",  desc: "General repairs/fixes, assembly & disassembly services, tv wall installation etc",                                                 from: "POA"       },
   { icon: Building2,    label: "End of Tenancy Clean",  desc: "Guaranteed deposit-back end of tenancy/one-off deep clean",                                                                       from: "£25/hr", slug: "end-of-tenancy-cleaning-peterborough" },
   { icon: CheckCircle2, label: "Domestic Clean",        desc: "Regular, flexible private property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean (Charges separately)", from: "£20/hr" },
-  { icon: Home,         label: "Airbnb & Serviced Accommodation Cleaning", desc: "Changeover cleaning between guests, with linen hire, laundry and restocking available",                                        from: "£20/hr", slug: "airbnb-changeover-cleaning-peterborough" },
+  { icon: Home,         label: "Airbnb & Serviced Accommodation Cleaning", desc: "Changeover cleaning between guests, with linen hire, laundry and restocking available",                                        from: "£25/hr", slug: "airbnb-changeover-cleaning-peterborough" },
   { icon: Sparkles,     label: "Commercial Clean",      desc: "Regular, flexible offices and retail property clean. Other Services includes: Carpet & Upholstery deep clean & Oven Deep Clean", from: "£25/hr"    },
   { icon: Truck,        label: "Man & Van",             desc: "Tip run, Pick-up & Drop off, Local moves & collections",                                                                         from: "POA"       },
   { icon: Home,         label: "House Clearance",       desc: "House, Garage, Shed & Garden clearance, and disposed responsibly",                                                               from: "POA"       },
@@ -42,12 +44,13 @@ const services: { icon: React.ElementType; label: string; desc: string; from: st
   { icon: Wrench,       label: "Plumbing & Heating",    desc: "Qualified & reliable tradespeople for all plumbing works, such as bathroom tap/toilet/sink leaks & fixes",                      from: "POA"       },
   { icon: Brush,        label: "Painting & Decoration", desc: "Qualified & reliable tradespeople for all kinds of painting & decoration work",                                                  from: "£200/room" },
   { icon: Armchair,     label: "Sofa Deep Clean",       desc: "Professional upholstery & sofa cleaning",                                                                                        from: "£30/seat", slug: "carpet-and-sofa-cleaning-peterborough" },
+  { icon: Armchair,     label: "Mattress Deep Clean",   desc: "Professional mattress deep cleaning for single, double and king size mattresses",                                                 from: "£50", slug: "carpet-and-sofa-cleaning-peterborough" },
 ];
 
 // Hourly calculator settings (same limits as the booking screen)
 const CALC_LIMITS: Record<string, { rate: number; minHours: number; maxHours: number; maxCleaners: number }> = {
   domestic:   { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
-  airbnb:     { rate: 20, minHours: 2, maxHours: 8,  maxCleaners: 4  },
+  airbnb:     { rate: 25, minHours: 2, maxHours: 8,  maxCleaners: 4  },
   commercial: { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 10 },
   tenancy:    { rate: 25, minHours: 3, maxHours: 12, maxCleaners: 3  },
 };
@@ -62,13 +65,14 @@ const TENANCY_GUIDE = [
 
 const featuredPhotos = GALLERY.filter((g) => g.featured);
 
-const areas = ["Peterborough", "Wisbech", "March", "Market Deeping", "Bourne", "Stamford", "Whittlesey"];
-
-const reviews = [
-  { name: "Maria K.",     loc: "Peterborough",   stars: 5, text: "I was very happy with the service today. The upholstery, mattress, and sofa deep cleaning were done to a very high standard, and everything looks and feels much cleaner. Thank you for your excellent work." },
-  { name: "Kat.",         loc: "March",          stars: 5, text: "Punctual, friendly and did an excellent job on an end of tenancy clean on a 2 bedroom apartment. Thank you" },
-  { name: "Georgiana D.", loc: "Market Deeping", stars: 5, text: "Lovely service. Hard workers. Great experience all round" },
+// Mattress deep clean prices by size
+const MATTRESS_SIZES = [
+  { label: "Single mattress",    price: 50 },
+  { label: "Double mattress",    price: 65 },
+  { label: "King size mattress", price: 75 },
 ];
+
+const areas = ["Peterborough", "Wisbech", "March", "Market Deeping", "Bourne", "Stamford", "Whittlesey"];
 
 const trustItems = [
   { icon: ShieldCheck,   label: "Fully Insured"             },
@@ -99,6 +103,7 @@ export default function HomePage() {
   const [calcHours, setCalcHours] = useState(2);
   const [calcCleaners, setCalcCleaners] = useState(1);
   const [calcSize, setCalcSize] = useState(-1);
+  const [mattressSize, setMattressSize] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const limits = CALC_LIMITS[calcService];
@@ -106,6 +111,7 @@ export default function HomePage() {
     ? calcHours * calcCleaners * limits.rate
     : calcService === "carpet" ? 70
     : calcService === "oven" ? 70
+    : calcService === "mattress" ? MATTRESS_SIZES[mattressSize].price
     : calcService === "sofa" ? 30 : 0;
 
   const handleCalcService = (v: string) => {
@@ -333,7 +339,7 @@ export default function HomePage() {
                   style={{ width: "100%", border: "1.5px solid #dce3f0", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontFamily: "inherit", color: "#1a1a2e", background: "#fff", outline: "none" }}>
                   <option value="">Select a Service</option>
                   <option value="domestic">Domestic Cleaning — £20/hr per cleaner</option>
-                  <option value="airbnb">Airbnb / Serviced Accommodation — £20/hr per cleaner</option>
+                  <option value="airbnb">Airbnb / Serviced Accommodation — £25/hr per cleaner</option>
                   <option value="commercial">Commercial Cleaning — £25/hr per cleaner</option>
                   <option value="tenancy">End of Tenancy / Deep Clean — £25/hr per cleaner</option>
                   <option value="carpet">Carpet & Upholstery — £70/room</option>
@@ -344,6 +350,7 @@ export default function HomePage() {
                   <option value="plumbing">Plumbing & Heating — POA</option>
                   <option value="painting">Painting & Decoration — £200/room</option>
                   <option value="sofa">Sofa Deep Clean — £30/seat</option>
+                  <option value="mattress">Mattress Deep Clean — From £50</option>
                 </select>
               </div>
 
@@ -386,7 +393,19 @@ export default function HomePage() {
                 </div>
               )}
 
-              {(limits || ["carpet", "oven", "sofa"].includes(calcService)) && (
+              {calcService === "mattress" && (
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", display: "block", marginBottom: 8 }}>MATTRESS SIZE</label>
+                  <select value={mattressSize} onChange={(e) => setMattressSize(Number(e.target.value))}
+                    style={{ width: "100%", border: "1.5px solid #dce3f0", borderRadius: 8, padding: "12px 16px", fontSize: 14, fontFamily: "inherit", color: "#1a1a2e", background: "#fff", outline: "none" }}>
+                    {MATTRESS_SIZES.map((m, i) => (
+                      <option key={m.label} value={i}>{m.label} — £{m.price}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {(limits || ["carpet", "oven", "sofa", "mattress"].includes(calcService)) && (
                 <div style={{ background: "#f0f5ff", borderRadius: 12, padding: "16px 20px", marginBottom: 16 }}>
                   <div style={{ fontSize: 11, fontWeight: 700, color: "#8a96b0", letterSpacing: "0.08em", marginBottom: 6 }}>ESTIMATED PRICE</div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -399,6 +418,7 @@ export default function HomePage() {
                         {calcService === "carpet" && "per room"}
                         {calcService === "oven" && "standard oven"}
                         {calcService === "sofa" && "per seat"}
+                        {calcService === "mattress" && MATTRESS_SIZES[mattressSize].label.toLowerCase()}
                       </div>
                     </div>
                     <div style={{ width: 44, height: 44, background: "#1a6bff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -520,6 +540,7 @@ export default function HomePage() {
                     ["End of Tenancy / Deep Clean",    "£25/hr per cleaner"],
                     ["Carpet Deep Clean",              "£70/room"          ],
                     ["Sofa Deep Clean",                "£30/sofa seat"     ],
+                    ["Mattress Deep Clean",            "From £50"          ],
                     ["Oven Deep Clean",                "£70/oven"          ],
                     ["Painting & Decoration",          "£200/room"         ],
                     ["Man & Van",                      "POA"               ],
@@ -596,7 +617,7 @@ export default function HomePage() {
               <div style={{ textAlign: "center", marginBottom: 48 }}>
                 <div className="section-label">Our Work</div>
                 <h2 className="section-title">Before & After</h2>
-                <p className="section-sub">Real jobs from properties around Peterborough & surrounding areas...</p>
+                <p className="section-sub">Real jobs from properties around Peterborough & surrounding areas…</p>
               </div>
               <BeforeAfterGallery items={featuredPhotos} />
             </div>
@@ -610,25 +631,7 @@ export default function HomePage() {
               <div className="section-label">Customer Reviews</div>
               <h2 className="section-title">What Our Clients Say</h2>
             </div>
-            <div className="grid-3">
-              {reviews.map(({ name, loc, stars, text }) => (
-                <div key={name} style={{ background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 16, padding: 28 }}>
-                  <div style={{ display: "flex", gap: 3, marginBottom: 14 }}>
-                    {Array.from({ length: stars }).map((_, i) => <Star key={i} size={16} fill="#facc15" color="#facc15" />)}
-                  </div>
-                  <p style={{ fontSize: 15, color: "#3d4a6b", lineHeight: 1.65, fontStyle: "italic" }}>"{text}"</p>
-                  <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 36, height: 36, background: "#e8f0ff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#1a6bff" }}>
-                      {name[0]}
-                    </div>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: 14, color: "#0d1b3e" }}>{name}</div>
-                      <div style={{ fontSize: 12, color: "#8a96b0" }}>{loc}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ReviewCards items={REVIEWS} showLeaveButton />
           </div>
         </section>
 

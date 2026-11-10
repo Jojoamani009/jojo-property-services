@@ -7,6 +7,8 @@ import ServiceMenu from "../../components/ServiceMenu";
 import QuotePanel from "../../components/QuotePanel";
 import BeforeAfterGallery from "../../components/BeforeAfterGallery";
 import { GALLERY } from "../../lib/gallery";
+import ReviewCards from "../../components/ReviewCards";
+import { REVIEWS, GOOGLE_REVIEW_URL } from "../../lib/reviews";
 
 type Props = { params: Promise<{ service: string }> };
 
@@ -40,6 +42,7 @@ export default async function ServicePage({ params }: Props) {
   const cols = hm ? Array.from({ length: Math.min(3, hm.maxStaff) }, (_, i) => i + 1) : [];
 
   const photos = GALLERY.filter((g) => g.service === s.slug);
+  const pageReviews = REVIEWS.filter((r) => r.services.includes(s.slug));
 
   const faqSchema = s.faqs && {
     "@context": "https://schema.org",
@@ -203,6 +206,13 @@ export default async function ServicePage({ params }: Props) {
               <h2 style={h2}>Our work</h2>
               <p style={{ color: "#5a6782", marginBottom: 16 }}>Drag the slider to compare before and after.</p>
               <BeforeAfterGallery items={photos} />
+            </>
+          )}
+
+          {(pageReviews.length > 0 || GOOGLE_REVIEW_URL !== "") && (
+            <>
+              <h2 style={h2}>{pageReviews.length > 0 ? "What customers say" : "Used our service?"}</h2>
+              <ReviewCards items={pageReviews} showLeaveButton />
             </>
           )}
 
