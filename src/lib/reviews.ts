@@ -6,7 +6,7 @@ export const GOOGLE_REVIEW_URL = "https://g.page/r/CTT-UGCAU-XWEAE/review" as st
 
 // 2. Fill these in with your REAL Google rating and review count (for example 4.9 and 37).
 //    They show only when both are above 0. Do not guess these numbers.
-export const GOOGLE_RATING = { score: 0, count: 0 };
+export const GOOGLE_RATING = { score: 4.8, count: 23 };
 
 export type Review = {
   name: string;
