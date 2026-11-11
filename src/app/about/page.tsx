@@ -37,10 +37,12 @@ export default function AboutPage() {
             <li>Deep cleans and one-off cleans</li>
             <li>Carpet & upholstery deep clean</li>
             <li>Clearance & waste removal services</li>
+            <li>Man & Van services</li>
             <li>Painting & Decoration</li>
             <li>Garden Maintenance</li>
             <li>Furniture assembly & disassembly</li>
             <li>Garden fence panel installation</li>
+            <li>Plumbing services</li>
             <li>Add-on services tailored to your needs</li>
             <li>Flexible booking via our website, phone, or WhatsApp</li>
           </ul>

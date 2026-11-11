@@ -315,7 +315,7 @@ export default function HomePage() {
                 <a href="/booking" className="btn-outline">Book Online</a>
               </div>
               <div style={{ display: "flex", gap: 28, marginTop: 36, flexWrap: "wrap" }}>
-                {[{ val: "500+", label: "Happy Clients" }, { val: "8+", label: "Years Experience" }, { val: "100%", label: "Insured & Vetted" }].map(({ val, label }) => (
+                {[{ val: "150+", label: "Happy Clients" }, { val: "2+", label: "Years Experience" }, { val: "100%", label: "Insured & Vetted" }].map(({ val, label }) => (
                   <div key={label}>
                     <div style={{ fontSize: 26, fontWeight: 700, color: "#60a5fa", fontFamily: "'Playfair Display', serif" }}>{val}</div>
                     <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", marginTop: 2 }}>{label}</div>
@@ -573,7 +573,7 @@ export default function HomePage() {
                 { icon: Leaf,          title: "Eco-Friendly Products",     desc: "Safe for children, pets, and the environment." },
                 { icon: PoundSterling, title: "No Hidden Costs",           desc: "Upfront quotes — what we say is what you pay." },
                 { icon: Clock,         title: "Flexible Hours",            desc: "Evenings and weekends available to suit your schedule." },
-                { icon: Star,          title: "5-Star Rated",              desc: "Hundreds of satisfied customers across the region." },
+                { icon: Star,          title: "4.8 Star Rated",              desc: "150+ of satisfied customers across the region." },
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} style={{ display: "flex", gap: 16, alignItems: "flex-start", background: "#fff", border: "1.5px solid #eef1f8", borderRadius: 14, padding: "24px 20px" }}>
                   <div style={{ background: "#e8f0ff", width: 42, height: 42, borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
