@@ -3,7 +3,7 @@ import { GOOGLE_RATING, GOOGLE_REVIEW_URL, type Review } from "../lib/reviews";
 // Review cards, an optional rating line and an optional "Leave us a review" button.
 export default function ReviewCards({ items, showLeaveButton = false }: { items: Review[]; showLeaveButton?: boolean }) {
   const hasRating = GOOGLE_RATING.score > 0 && GOOGLE_RATING.count > 0;
-  const hasButton = showLeaveButton && GOOGLE_REVIEW_URL !== "";
+  const hasButton = showLeaveButton && String(GOOGLE_REVIEW_URL).length > 0;
 
   return (
     <div>

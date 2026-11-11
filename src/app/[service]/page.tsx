@@ -43,6 +43,7 @@ export default async function ServicePage({ params }: Props) {
 
   const photos = GALLERY.filter((g) => g.service === s.slug);
   const pageReviews = REVIEWS.filter((r) => r.services.includes(s.slug));
+  const hasReviewUrl = String(GOOGLE_REVIEW_URL).length > 0; // works even if the link is empty
 
   const faqSchema = s.faqs && {
     "@context": "https://schema.org",
@@ -209,7 +210,7 @@ export default async function ServicePage({ params }: Props) {
             </>
           )}
 
-          {(pageReviews.length > 0 || GOOGLE_REVIEW_URL !== "") && (
+          {(pageReviews.length > 0 || hasReviewUrl) && (
             <>
               <h2 style={h2}>{pageReviews.length > 0 ? "What customers say" : "Used our service?"}</h2>
               <ReviewCards items={pageReviews} showLeaveButton />

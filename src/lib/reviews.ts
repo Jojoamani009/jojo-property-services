@@ -2,7 +2,7 @@
 
 // 1. Paste your Google review link here (Google Business Profile > "Ask for reviews").
 //    While this is empty, the "Leave us a review" buttons stay hidden.
-export const GOOGLE_REVIEW_URL = "https://g.page/r/CTT-UGCAU-XWEAE/review";
+export const GOOGLE_REVIEW_URL = "https://g.page/r/CTT-UGCAU-XWEAE/review" as string;
 
 // 2. Fill these in with your REAL Google rating and review count (for example 4.9 and 37).
 //    They show only when both are above 0. Do not guess these numbers.
